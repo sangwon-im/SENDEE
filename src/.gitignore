@@ -1,0 +1,6 @@
+img/
+data/
+models/
+.vscode/
+
+/__pycache__
