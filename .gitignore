@@ -1,6 +1,5 @@
-src/img/*
-src/data/*
-src/models/*
-src/.vscode/
+src/data/test/*
+src/data/train/*
 
+src/.vscode/
 src/__pycache__
