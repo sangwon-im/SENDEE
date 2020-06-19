@@ -11,31 +11,6 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-# Define data generators
-train_dir = 'data/train'
-val_dir = 'data/test'
-
-num_train = 28709
-num_val = 7178
-batch_size = 64
-num_epoch = 1
-
-train_datagen = ImageDataGenerator(rescale=1./255)
-val_datagen = ImageDataGenerator(rescale=1./255)
-
-train_generator = train_datagen.flow_from_directory(
-        train_dir,
-        target_size=(48,48),
-        batch_size=batch_size,
-        color_mode="grayscale",
-        class_mode='categorical')
-
-validation_generator = val_datagen.flow_from_directory(
-        val_dir,
-        target_size=(48,48),
-        batch_size=batch_size,
-        color_mode="grayscale",
-        class_mode='categorical')
 
 model = Sequential()
 

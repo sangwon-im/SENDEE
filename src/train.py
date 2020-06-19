@@ -1,6 +1,10 @@
 import time
 from model import *
 
+from tensorflow.python.client import device_lib
+print(device_lib.list_local_devices())
+
+
 nowtime = time.strftime('%Y%m%d_%H%M', time.localtime(time.time()))
 
 # plots accuracy and loss curves
@@ -29,6 +33,34 @@ def plot_model_history(model_history):
 
 
 # If you want to train the same model or try other models, go for this
+
+# Define data generators
+train_dir = 'data/train'
+val_dir = 'data/test'
+
+num_train = 28709
+num_val = 7178
+batch_size = 64
+num_epoch = 1
+
+train_datagen = ImageDataGenerator(rescale=1./255)
+val_datagen = ImageDataGenerator(rescale=1./255)
+
+train_generator = train_datagen.flow_from_directory(
+        train_dir,
+        target_size=(48,48),
+        batch_size=batch_size,
+        color_mode="grayscale",
+        class_mode='categorical')
+
+validation_generator = val_datagen.flow_from_directory(
+        val_dir,
+        target_size=(48,48),
+        batch_size=batch_size,
+        color_mode="grayscale",
+        class_mode='categorical')
+
+
 
 model.compile(loss='categorical_crossentropy',optimizer=Adam(lr=0.0001, decay=1e-6),metrics=['accuracy'])
 model_info = model.fit_generator(
