@@ -10,11 +10,11 @@ capture = cv2.VideoCapture(0)
 capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
 capture.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
 
+#직전 값과, 지금까지의 누적 값
 def face_tracking(x_pos, y_pos):
     if x_pos > 0.1: #카메라 입장에서 오른쪽
         print('move head rightward')
         #speed 를 x_pos의 절대값에 비례하도록
-        
     elif x_pos < -0.1:
         print('move head leftward')
     if y_pos > 0.1:
