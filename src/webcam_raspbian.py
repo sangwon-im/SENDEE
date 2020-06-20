@@ -55,6 +55,9 @@ while True:
         if len(face_locations) > 1:
             face_locations = face_locations[:1]
             #일단 이건 인식된 사람 순
+        
+        for (top, right, bottom, left) in face_locations:
+            cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
 
         print("number of people: ", len(face_locations))
         print("x", x_pos," y:", y_pos)
@@ -70,7 +73,6 @@ while True:
 
         #읽어낸 사진을 사진파일로 저장?
 
-        # cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
 
     cv2.imshow('frame', frame)
     
