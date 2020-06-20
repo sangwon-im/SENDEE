@@ -5,7 +5,7 @@ import pickle
 HEIGHT = 240
 WIDTH = 360 
 
-capture = cv2.VideoCapture(0)
+capture = cv2.VideoCapture(-1)
 capture.set(3, WIDTH)
 capture.set(4, HEIGHT)
 
