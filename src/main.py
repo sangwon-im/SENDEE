@@ -1,30 +1,13 @@
 #웹캠 읽고 감정 저장
 #사람 등록 버튼(누군지)
 #위치, 누구인지, 감정   
-#
-#
-#
-#
-#
-##구동부
 
-#무엇이 문제인가
+##구동부
+#메인 함수는 0.1초 단위로 돈다, 따라서 움직임 트래킹은 웹캠단에서 처리해야 한다.
+
 import time
 # import tkinter
 import pickle
-
-def face_position():
-    file = open("WebcamOutput", "rb")
-    content = pickle.load(file)
-    
-
-def face_tracking():
-    
-    return 0
-
-def moving():
-    
-    return 0
 
 def facial_expression():
     return 0
@@ -46,8 +29,8 @@ def main():
         #혼자 장난치는 패턴 여러개
         # webcam.webcam()
         face_position()
-        
-        
+
         time.sleep(0.1)
+        
 main()
 
