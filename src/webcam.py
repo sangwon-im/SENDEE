@@ -28,18 +28,30 @@ while True:
     ret, frame = capture.read()
     if not ret: break
 
-    rgb_for_face = frame[:,:,::-1]
+    rgb_for_face = frame[::]
     gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
-    file = open("pkl/rgb_for_face.pkl", "wb")
-    pickle.dump(rgb_for_face, file) #dic을 file에 쓴다
-    file.close()
+    #rgb 이미지 피클로 저장, 얼굴인식
+    with open("pkl/rgb_for_face.pkl", "wb") as file:
+        pickle.dump(rgb_for_face, file) 
 
-    file = open("pkl/gray_for_emotion.pkl", "wb")
-    pickle.dump(gray_for_emotion, file) #dic을 file에 쓴다
-    file.close()
+    #gray 이미지 피클로 저장, 표정
+    with open("pkl/gray_for_emotion.pkl", "wb") as file:
+        pickle.dump(gray_for_emotion, file)
 
     face_locations = face_recognition.face_locations(rgb_for_face)
+
+    ######################################
+    #얼굴 위치 피클로 저장
+    print("number of people: ", len(face_locations))
+    
+    if len(face_locations)==0:
+        pass
+    elif len(face_locations)>1:
+        face_locations=[face_locations[0]]
+    with open("pkl/face_locations.pkl", "wb") as file:
+        pickle.dump(face_locations, file)
+    #########################################
 
     for (top, right, bottom, left) in face_locations:
         x_pos = (right+left)/2
@@ -53,25 +65,18 @@ while True:
         #아니면 더 큰 쪽으로 인식이 가능한가?
 
         #그러면 사람이 두명일 때 각각의 left right 값이 어떻게 변하는지
-        if len(face_locations) > 1:
-            face_locations = face_locations[:1]
-            #일단 이건 인식된 사람 순
+        
 
-        print("number of people: ", len(face_locations))
         print("x", x_pos," y:", y_pos)
 
         #읽어낸 좌표를 피클 파일로 계속 저장
-        dic = {"face_location": (x_pos, y_pos)}
-        file = open("pkl/face_location.pkl", "wb")
-        pickle.dump(dic, file) #dic을 file에 쓴다
-        file.close()
 
         ##파일로 쏘지 말고 여기서 모터 구동을 제어하자!
         face_tracking(x_pos, y_pos)
 
         #읽어낸 사진을 사진파일로 저장?
 
-        cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
+#         cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
 
     cv2.imshow('frame', frame)
     

@@ -8,14 +8,58 @@
 import time
 # import tkinter
 import pickle
+import cv2
+import face_recognition
+import os
 
-def facial_expression():
-    with open()
-    return 0
+#img 폴더에 있는 사진을 인코딩해서 {이름:인코딩} 의 딕셔너리로 바꾸고, names_encodings.pkl 파일에 저장
+def img2encoding():
+    known_face_names = []
+    known_face_encodings = []
+
+    images = os.listdir("img/")
+    for image in images:
+        image_name = image.split('.')[0]
+        known_face_names.append(image_name)
+        
+        image_encoding = face_recognition.face_encodings(face_recognition.load_image_file(f"img/{image_name}.jpg"))[0]
+        known_face_encodings.append(image_encoding)
+
+    names_encodings = dict(zip(known_face_names, known_face_encodings))
+
+    with open("pkl/names_encodings.pkl", "wb") as file:
+        pickle.dump(names_encodings, file)
+
+
+def face_reco():
+    ##rgb_for_face 불러오기
+    with open("pkl/rgb_for_face.pkl", "rb") as file:
+        rgb_for_face = pickle.load(file)
+    cv2.imwrite('rgb.png',rgb_for_face)    
+    
+    ##face_locations 불러오기
+    with open("pkl/face_locations.pkl", "rb") as file:
+        face_locations = pickle.load(file)
+    
+    ##위에서 불러온 두개 이용해서 
+    face_encodings = face_recognition.face_encodings(rgb_for_face, face_locations, num_jitters=1)
+    
+    print(face_locations)
+    print(face_encodings)
+
+    
+    # print(face_encodings)
+
+
+def face_emo():
+    with open("pkl/gray_for_emotion.pkl", "rb") as file:
+        gray_for_emotion = pickle.load(file)
+    # cv2.imwrite('gray.png',gray_for_emotion)
+    #감정표현이 들어오면 딜레이를 피클파일에 저장, webcam 파일에서 읽어서 if문, 딜레이동안 webcam py 정지
+    #일시정지 여부를 피클로 보냄
 
 def main():
     while True:
-        print("hello")
         #랜덤 난수 생성
         #행동 패턴 리스트로 저장
         pattern = ('angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral')
@@ -29,9 +73,11 @@ def main():
         #neutral -> (장난, 심심, 졸음)
         #혼자 장난치는 패턴 여러개
         # webcam.webcam()
-        face_position()
+        # face_position()
+        face_reco()
+        face_emo()
+        time.sleep(1)
 
-        time.sleep(0.1)
         
-main()
-
+# main()
+img2encoding()

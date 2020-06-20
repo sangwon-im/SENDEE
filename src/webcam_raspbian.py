@@ -42,10 +42,12 @@ try:
         gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
         
         with open("pkl/rgb_for_face.pkl", "wb") as file:
-            pickle.dump(rgb_for_face, file) #dic을 file에 쓴다
+            pickle.dump(rgb_for_face, file) 
+            #dic을 file에 쓴다
 
         with open("pkl/gray_for_emotion.pkl", "wb") as file:
-            pickle.dump(gray_for_emotion, file) #dic을 file에 쓴다
+            pickle.dump(gray_for_emotion, file) 
+            #dic을 file에 쓴다
 
         face_locations = face_recognition.face_locations(frame)
         
