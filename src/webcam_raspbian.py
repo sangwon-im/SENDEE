@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 import face_recognition
 import motordrive
+import RPi.GPIO as GPIO
 
 HEIGHT = 240
 WIDTH = 320 
@@ -33,26 +34,27 @@ def face_tracking(x_pos, y_pos):
         print('move head downward')
     #얼마나 떨어져 있는지에 따라서 속도 다르게? PID 제어?
 
-while True:    
-    camera.capture(frame, format="rgb")
+try:
+    while True:    
+        camera.capture(frame, format="rgb")
 
-    rgb_for_face = frame
-    gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
-    
-    with open("pkl/rgb_for_face.pkl", "wb") as file:
-        pickle.dump(rgb_for_face, file) #dic을 file에 쓴다
+        rgb_for_face = frame
+        gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
+        
+        with open("pkl/rgb_for_face.pkl", "wb") as file:
+            pickle.dump(rgb_for_face, file) #dic을 file에 쓴다
 
-    with open("pkl/gray_for_emotion.pkl", "wb") as file:
-        pickle.dump(gray_for_emotion, file) #dic을 file에 쓴다
+        with open("pkl/gray_for_emotion.pkl", "wb") as file:
+            pickle.dump(gray_for_emotion, file) #dic을 file에 쓴다
 
-    face_locations = face_recognition.face_locations(frame)
-    
-    ####for 문을 뺄 수 있을까?
-    if len(face_locations)==0:
-        pass
-    elif len(face_locations)>1:
-        face_locations=face_locations[0]
-    else:
+        face_locations = face_recognition.face_locations(frame)
+        
+        ####for 문을 뺄 수 있을까?
+        if len(face_locations)==0:
+            pass
+        elif len(face_locations)>1:
+            face_locations=face_locations[0]
+            
         for (top, right, bottom, left) in face_locations:
             x_pos = (right+left)/2
             y_pos = (top+bottom)/2
@@ -65,8 +67,8 @@ while True:
             #아니면 더 큰 쪽으로 인식이 가능한가?
 
             #그러면 사람이 두명일 때 각각의 left right 값이 어떻게 변하는지
-            if len(face_locations) > 1:
-                face_locations = face_locations[:1]
+            # if len(face_locations) > 1:
+            #     face_locations = face_locations[:1]
                 #일단 이건 인식된 사람 순
             
             # 출력된 이미지에 프레임 씌우기
@@ -84,18 +86,22 @@ while True:
 
             ##파일로 쏘지 말고 여기서 모터 구동을 제어하자!
             face_tracking(x_pos, y_pos)
-            
-    ###########
-    hor_error_Sum = hor_error_Sum + x_pos
-    ver_error_Sum = ver_error_Sum + y_pos
-    motordrive.MPIDCtrl(x_pos, 0.1, hor_error_Sum, hor_error_Prev)
-    past_dc = motordrive.Servo(y_pos, 0.1, past_dc, ver_error_Sum, ver_error_Prev)
-    # 0.1 sec movememt
-    hor_error_Prev = x_pos
-    ver_error_Prev = y_pos
-    ###########
+                
+        ###########
+        hor_error_Sum = hor_error_Sum + x_pos
+        ver_error_Sum = ver_error_Sum + y_pos
+        motordrive.MPIDCtrl(x_pos, 0.1, hor_error_Sum, hor_error_Prev)
+        past_dc = motordrive.Servo(y_pos, 0.1, past_dc, ver_error_Sum, ver_error_Prev)
+        # 0.1 sec movememt
+        hor_error_Prev = x_pos
+        ver_error_Prev = y_pos
+        ###########
 
-#     cv2.imshow('frame', frame)
-#     if cv2.waitKey(1) == ord('q'): break
-# capture.release()
-# cv2.destroyAllWindows()
+    #     cv2.imshow('frame', frame)
+    #     if cv2.waitKey(1) == ord('q'): break
+    # capture.release()
+    # cv2.destroyAllWindows()
+except KeyboardInterrupt:
+    print("Quit")
+finally:
+    GPIO.cleanup()
