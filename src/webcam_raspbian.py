@@ -25,23 +25,20 @@ def face_tracking(x_pos, y_pos):
     #얼마나 떨어져 있는지에 따라서 속도 다르게? PID 제어?
 
 while True:    
-    # ret, frame = capture.read()
-    # if not ret: break
-
     camera.capture(frame, format="rgb")
 
-    rgb_for_face = frame[:,:,::-1]
-    gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # rgb_for_face = frame[:,:,::-1]
+    # gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
-    file = open("pkl/rgb_for_face.pkl", "wb")
-    pickle.dump(rgb_for_face, file) #dic을 file에 쓴다
-    file.close()
+    # file = open("pkl/rgb_for_face.pkl", "wb")
+    # pickle.dump(rgb_for_face, file) #dic을 file에 쓴다
+    # file.close()
 
-    file = open("pkl/gray_for_emotion.pkl", "wb")
-    pickle.dump(gray_for_emotion, file) #dic을 file에 쓴다
-    file.close()
+    # file = open("pkl/gray_for_emotion.pkl", "wb")
+    # pickle.dump(gray_for_emotion, file) #dic을 file에 쓴다
+    # file.close()
 
-    face_locations = face_recognition.face_locations(rgb_for_face)
+    face_locations = face_recognition.face_locations(frame)
 
     for (top, right, bottom, left) in face_locations:
         x_pos = (right+left)/2
@@ -63,23 +60,21 @@ while True:
         print("x", x_pos," y:", y_pos)
 
         #읽어낸 좌표를 피클 파일로 계속 저장
-        dic = {"face_location": (x_pos, y_pos)}
-        file = open("pkl/face_location.pkl", "wb")
-        pickle.dump(dic, file) #dic을 file에 쓴다
-        file.close()
+        # dic = {"face_location": (x_pos, y_pos)}
+        # file = open("pkl/face_location.pkl", "wb")
+        # pickle.dump(dic, file) #dic을 file에 쓴다
+        # file.close()
 
         ##파일로 쏘지 말고 여기서 모터 구동을 제어하자!
         face_tracking(x_pos, y_pos)
 
         #읽어낸 사진을 사진파일로 저장?
 
-        cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
+        # cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
 
-    cv2.imshow('frame', frame)
+    # cv2.imshow('frame', frame)
     
-    
-    
-    if cv2.waitKey(1) == ord('q'): break
+    # if cv2.waitKey(1) == ord('q'): break
 
-capture.release()
-cv2.destroyAllWindows()
+# capture.release()
+# cv2.destroyAllWindows()
