@@ -41,11 +41,14 @@ while True:
 
     face_locations = face_recognition.face_locations(rgb_for_face)
     ######################################
-    #얼굴 위치 피클로 저장
+    #얼굴 위치 피클로 저장, 한명만 저장인데 먼저 인식된? 
     print("number of people: ", len(face_locations))
     
+
+    ##########################################3
+    #추가해야할 것, 얼굴 큰 사람이 인식되게끔!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if len(face_locations)==0:
-        pass
+        face_locations=[0,]
     elif len(face_locations)>1:
         face_locations=[face_locations[0]]
     with open("pkl/face_locations.pkl", "wb") as file:
@@ -61,18 +64,12 @@ while True:
 
         #두명이 인식되면, 먼저 인식된 사람 순으로?
         #아니면 더 큰 쪽으로 인식이 가능한가?
-
-        #그러면 사람이 두명일 때 각각의 left right 값이 어떻게 변하는
         print("x", x_pos," y:", y_pos)
-
-        #읽어낸 좌표를 피클 파일로 계속 저장
 
         ##파일로 쏘지 말고 여기서 모터 구동을 제어하자!
         face_tracking(x_pos, y_pos)
 
-        #읽어낸 사진을 사진파일로 저장?
-
-        #cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
+        cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
 
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) == ord('q'): break

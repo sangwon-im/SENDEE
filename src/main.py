@@ -41,29 +41,28 @@ def face_reco():
     with open("pkl/face_locations.pkl", "rb") as file:
         face_location = pickle.load(file)
     
-    ##위에서 불러온 두개 이용해서 
+    ##불러온 파일 이용해서 인코딩 구한다
     face_encoding = face_recognition.face_encodings(rgb_for_face, face_location, num_jitters=1)
 
     with open("pkl/known_face_names.pkl", "rb") as file:
         known_face_names = pickle.load(file)
     with open("pkl/known_face_encodings.pkl", "rb") as file:
         known_face_encodings = pickle.load(file)
-    
-    print("known", known_face_encodings)
-    print("face", face_encoding)
+
     matches = face_recognition.compare_faces(known_face_encodings, face_encoding[0])
-    print(matches)
-    print(known_face_names)
+
+    print(face_encoding)
     if True in matches:
-        matches.index('True')
+        name = known_face_names[matches.index(True)]
     else:
-        name="unknown"
-
-
+        name = "unknown"
+    
+    return name
 
 def face_emo():
     with open("pkl/gray_for_emotion.pkl", "rb") as file:
         gray_for_emotion = pickle.load(file)
+    
     # cv2.imwrite('gray.png',gray_for_emotion)
     #감정표현이 들어오면 딜레이를 피클파일에 저장, webcam 파일에서 읽어서 if문, 딜레이동안 webcam py 정지
     #일시정지 여부를 피클로 보냄
@@ -74,6 +73,11 @@ def main():
         #행동 패턴 리스트로 저장
         pattern = ('angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral')
         
+        name = face_reco()
+        emotion = face_emo()
+
+        # print(name)
+        # print(emotion)
         #angry -> (화냄, 시선 회피, 울음)
         #disgust -> (궁금, 회피, 화냄)
         #fear -> (위로)
@@ -84,10 +88,9 @@ def main():
         #혼자 장난치는 패턴 여러개
         # webcam.webcam()
         # face_position()
-        face_reco()
-        face_emo()
+        # face_emo()
         time.sleep(1)
 
         
 # main()
-face_reco()
+main()
