@@ -3,9 +3,18 @@ import cv2
 import numpy as np
 import pickle
 import face_recognition
+import motordrive
 
 HEIGHT = 240
 WIDTH = 320 
+
+##########
+hor_error_Sum = 0
+hor_error_Prev = 0
+ver_error_Sum = 0
+ver_error_Prev = 0
+past_dc = 0
+##########
 
 camera = picamera.PiCamera()
 camera.resolution = (WIDTH, HEIGHT)
@@ -30,23 +39,28 @@ while True:
     rgb_for_face = frame
     gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     
-    # file = open("pkl/rgb_for_face.pkl", "wb")
-    # pickle.dump(rgb_for_face, file) #dic을 file에 쓴다
-    # file.close()
+    with open("pkl/rgb_for_face.pkl", "wb") as file:
+        pickle.dump(rgb_for_face, file) #dic을 file에 쓴다
 
-    # file = open("pkl/gray_for_emotion.pkl", "wb")
-    # pickle.dump(gray_for_emotion, file) #dic을 file에 쓴다
-    # file.close()
+    with open("pkl/gray_for_emotion.pkl", "wb") as file:
+        pickle.dump(gray_for_emotion, file) #dic을 file에 쓴다
 
     face_locations = face_recognition.face_locations(frame)
-
-    for (top, right, bottom, left) in face_locations:
+    
+    ####for 문을 뺄 수 있을까?
+    if len(face_locations)==0:
+        pass
+    elif len(face_location)>1:
+        face_locations=face_locations[0]
+    else:
+        
+    # for (top, right, bottom, left) in face_locations:
         x_pos = (right+left)/2
         y_pos = (top+bottom)/2
 
-        x_pos = (x_pos - (WIDTH/2)) / WIDTH *2 +0.1
+        x_pos = (x_pos - (WIDTH/2)) / WIDTH *2
+        # x_pos = (x_pos - (WIDTH/2)) / WIDTH *2 +0.1
         y_pos = -(y_pos - (HEIGHT/2)) / HEIGHT *2
-
 
         #두명이 인식되면, 먼저 인식된 사람 순으로?
         #아니면 더 큰 쪽으로 인식이 가능한가?
@@ -56,8 +70,9 @@ while True:
             face_locations = face_locations[:1]
             #일단 이건 인식된 사람 순
         
-        for (top, right, bottom, left) in face_locations:
-            cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
+        # 출력된 이미지에 프레임 씌우기
+        # for (top, right, bottom, left) in face_locations:
+        #     cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
 
         print("number of people: ", len(face_locations))
         print("x", x_pos," y:", y_pos)
@@ -70,13 +85,18 @@ while True:
 
         ##파일로 쏘지 말고 여기서 모터 구동을 제어하자!
         face_tracking(x_pos, y_pos)
+        
+    ###########
+    hor_error_Sum = hor_error_Sum + x_pos
+    ver_error_Sum = ver_error_Sum + y_pos
+    motordrive.MPIDCtrl(x_pos, 0.1, hor_error_Sum, hor_error_Prev)
+    past_dc = motordrive.Servo(y_pos, 0.1, past_dc, ver_error_Sum, ver_error_Prev)
+    # 0.1 sec movememt
+    hor_error_Prev = x_pos
+    ver_error_Prev = y_pos
+    ###########
 
-        #읽어낸 사진을 사진파일로 저장?
-
-
-    cv2.imshow('frame', frame)
-    
-    # if cv2.waitKey(1) == ord('q'): break
-
+#     cv2.imshow('frame', frame)
+#     if cv2.waitKey(1) == ord('q'): break
 # capture.release()
 # cv2.destroyAllWindows()
