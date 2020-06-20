@@ -27,8 +27,8 @@ def face_tracking(x_pos, y_pos):
 while True:    
     camera.capture(frame, format="rgb")
 
-    # rgb_for_face = frame[:,:,::-1]
-    # gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    rgb_for_face = frame
+    gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_RGB2GRAY)
     
     # file = open("pkl/rgb_for_face.pkl", "wb")
     # pickle.dump(rgb_for_face, file) #dic을 file에 쓴다
@@ -72,7 +72,7 @@ while True:
 
         # cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
 
-    # cv2.imshow('frame', frame)
+    cv2.imshow('frame', frame)
     
     # if cv2.waitKey(1) == ord('q'): break
 
