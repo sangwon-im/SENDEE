@@ -43,12 +43,12 @@ def Rot(speed, time):
         setMotor(CH2, speed, BACKWARD)
         sleep(time)
 
-    else if speed < 0:    
+    elif speed < 0:    
         setMotor(CH1, speed, BACKWARD)
         setMotor(CH2, speed, FORWARD)
         sleep(time)
 
-    else    
+    else:    
         setMotor(CH1, 0, STOP)
         setMotor(CH2, 0, STOP)
         sleep(time)
@@ -98,10 +98,10 @@ def MPIDCtrl(error_Now, interval, error_Sum, error_Prev):          # While ым╕ ы
     if speed > 100:
         speed = 100
 
-    else if speed < -100:
+    elif speed < -100:
         speed = -100
 
-    else if abs(speed) < 20:
+    elif abs(speed) < 20:
         speed = 0
 
     Rot(speed, interval)
@@ -133,7 +133,7 @@ IN4 = 5  #pin 29
 # servo bound
 head_mindc = 3.3
 head_maxdc = 16
-head_interval = (R_maxdc - R_mindc)/20
+head_interval = (head_maxdc - head_mindc)/20
 
         
 GPIO.setmode(GPIO.BCM)

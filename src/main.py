@@ -10,7 +10,7 @@ import time
 import pickle
 
 def facial_expression():
-    
+    with open()
     return 0
 
 def main():
