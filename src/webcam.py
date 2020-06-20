@@ -3,11 +3,12 @@ import face_recognition
 import pickle
 
 HEIGHT = 240
-WIDTH = 360 
+WIDTH = 320 
 
 capture = cv2.VideoCapture(-1)
 capture.set(3, WIDTH)
 capture.set(4, HEIGHT)
+capture.set(5, 10)
 
 #직전 값과, 지금까지의 누적 값
 def face_tracking(x_pos, y_pos):
@@ -39,7 +40,6 @@ while True:
         pickle.dump(gray_for_emotion, file)
 
     face_locations = face_recognition.face_locations(rgb_for_face)
-
     ######################################
     #얼굴 위치 피클로 저장
     print("number of people: ", len(face_locations))
@@ -59,13 +59,10 @@ while True:
         x_pos = (x_pos - (WIDTH/2)) / WIDTH *2 +0.1
         y_pos = -(y_pos - (HEIGHT/2)) / HEIGHT *2
 
-
         #두명이 인식되면, 먼저 인식된 사람 순으로?
         #아니면 더 큰 쪽으로 인식이 가능한가?
 
-        #그러면 사람이 두명일 때 각각의 left right 값이 어떻게 변하는지
-        
-
+        #그러면 사람이 두명일 때 각각의 left right 값이 어떻게 변하는
         print("x", x_pos," y:", y_pos)
 
         #읽어낸 좌표를 피클 파일로 계속 저장
@@ -75,12 +72,9 @@ while True:
 
         #읽어낸 사진을 사진파일로 저장?
 
-#         cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
+        #cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
 
     cv2.imshow('frame', frame)
-    
-    
-    
     if cv2.waitKey(1) == ord('q'): break
 
 capture.release()

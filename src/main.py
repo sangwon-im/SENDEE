@@ -37,8 +37,6 @@ def face_reco():
     ##rgb_for_face 불러오기
     with open("pkl/rgb_for_face.pkl", "rb") as file:
         rgb_for_face = pickle.load(file)
-    cv2.imwrite('rgb.png',rgb_for_face)    
-    
     ##face_locations 불러오기
     with open("pkl/face_locations.pkl", "rb") as file:
         face_location = pickle.load(file)
@@ -51,9 +49,16 @@ def face_reco():
     with open("pkl/known_face_encodings.pkl", "rb") as file:
         known_face_encodings = pickle.load(file)
     
-    print(known_face_encodings)
-    # matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-    # print(face_encodings)
+    print("known", known_face_encodings)
+    print("face", face_encoding)
+    matches = face_recognition.compare_faces(known_face_encodings, face_encoding[0])
+    print(matches)
+    print(known_face_names)
+    if True in matches:
+        matches.index('True')
+    else:
+        name="unknown"
+
 
 
 def face_emo():
