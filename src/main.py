@@ -25,10 +25,12 @@ def img2encoding():
         image_encoding = face_recognition.face_encodings(face_recognition.load_image_file(f"img/{image_name}.jpg"))[0]
         known_face_encodings.append(image_encoding)
 
-    names_encodings = dict(zip(known_face_names, known_face_encodings))
+    # names_encodings = dict(zip(known_face_names, known_face_encodings))
 
-    with open("pkl/names_encodings.pkl", "wb") as file:
-        pickle.dump(names_encodings, file)
+    with open("pkl/known_face_names.pkl", "wb") as file:
+        pickle.dump(known_face_names, file)
+    with open("pkl/known_face_encodings.pkl", "wb") as file:
+        pickle.dump(known_face_encodings, file)
 
 
 def face_reco():
@@ -39,15 +41,18 @@ def face_reco():
     
     ##face_locations 불러오기
     with open("pkl/face_locations.pkl", "rb") as file:
-        face_locations = pickle.load(file)
+        face_location = pickle.load(file)
     
     ##위에서 불러온 두개 이용해서 
-    face_encodings = face_recognition.face_encodings(rgb_for_face, face_locations, num_jitters=1)
-    
-    print(face_locations)
-    print(face_encodings)
+    face_encoding = face_recognition.face_encodings(rgb_for_face, face_location, num_jitters=1)
 
+    with open("pkl/known_face_names.pkl", "rb") as file:
+        known_face_names = pickle.load(file)
+    with open("pkl/known_face_encodings.pkl", "rb") as file:
+        known_face_encodings = pickle.load(file)
     
+    print(known_face_encodings)
+    # matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
     # print(face_encodings)
 
 
@@ -80,4 +85,4 @@ def main():
 
         
 # main()
-img2encoding()
+face_reco()

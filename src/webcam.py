@@ -1,4 +1,3 @@
-
 import cv2
 import face_recognition
 import pickle
@@ -7,8 +6,8 @@ HEIGHT = 240
 WIDTH = 360 
 
 capture = cv2.VideoCapture(0)
-capture.set(cv2.CAP_PROP_FRAME_WIDTH, WIDTH)
-capture.set(cv2.CAP_PROP_FRAME_HEIGHT, HEIGHT)
+capture.set(3, WIDTH)
+capture.set(4, HEIGHT)
 
 #직전 값과, 지금까지의 누적 값
 def face_tracking(x_pos, y_pos):
