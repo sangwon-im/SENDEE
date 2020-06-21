@@ -2,13 +2,13 @@ import cv2
 import face_recognition
 import pickle
 
-HEIGHT = 240
-WIDTH = 320 
+HEIGHT = 120
+WIDTH =  160
 
 capture = cv2.VideoCapture(-1)
 capture.set(3, WIDTH)
 capture.set(4, HEIGHT)
-capture.set(5, 10)
+# capture.set(5, 5)
 
 #직전 값과, 지금까지의 누적 값
 def face_tracking(x_pos, y_pos):
@@ -23,32 +23,37 @@ def face_tracking(x_pos, y_pos):
         print('move head downward')
     #얼마나 떨어져 있는지에 따라서 속도 다르게? PID 제어?
 
+count = 1
+speed = 10
 
 while True:
     ret, frame = capture.read()
     if not ret: break
 
     rgb_for_face = frame[::]
-    gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    #rgb 이미지 피클로 저장, 얼굴인식
-    with open("pkl/rgb_for_face.pkl", "wb") as file:
-        pickle.dump(rgb_for_face, file) 
-
-    #gray 이미지 피클로 저장, 표정
-    with open("pkl/gray_for_emotion.pkl", "wb") as file:
-        pickle.dump(gray_for_emotion, file)
-
     face_locations = face_recognition.face_locations(rgb_for_face)
+    print("number of people: ", len(face_locations))
+    gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    #############10프레임에 한번 시행되는 부분###############
+    if count%speed == 0:
+        #rgb 이미지 피클로 저장, 얼굴인식
+        with open("pkl/rgb_for_face.pkl", "wb") as file:
+            pickle.dump(rgb_for_face, file) 
+        #gray 이미지 피클로 저장, 표정
+        with open("pkl/gray_for_emotion.pkl", "wb") as file:
+            pickle.dump(gray_for_emotion, file)
+        count = 1
+    else:
+        count += 1
     ######################################
     #얼굴 위치 피클로 저장, 한명만 저장인데 먼저 인식된? 
-    print("number of people: ", len(face_locations))
     
 
     ##########################################3
     #추가해야할 것, 얼굴 큰 사람이 인식되게끔!!!!!!!!!!!!!!!!!!!!!!!!!!!
     if len(face_locations)==0:
-        face_locations=[0,]
+        pass
     elif len(face_locations)>1:
         face_locations=[face_locations[0]]
     with open("pkl/face_locations.pkl", "wb") as file:

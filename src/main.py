@@ -11,6 +11,13 @@ import pickle
 import cv2
 import face_recognition
 import os
+from keras.utils import np_utils
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Activation
+import numpy as np
+from numpy import argmax
+from keras.models import load_model
 
 #img 폴더에 있는 사진을 인코딩해서 {이름:인코딩} 의 딕셔너리로 바꾸고, names_encodings.pkl 파일에 저장
 def img2encoding():
@@ -59,10 +66,15 @@ def face_reco():
     
     return name
 
+
 def face_emo():
     with open("pkl/gray_for_emotion.pkl", "rb") as file:
         gray_for_emotion = pickle.load(file)
+    model = load_model("models/model.h5")
     
+
+
+
     # cv2.imwrite('gray.png',gray_for_emotion)
     #감정표현이 들어오면 딜레이를 피클파일에 저장, webcam 파일에서 읽어서 if문, 딜레이동안 webcam py 정지
     #일시정지 여부를 피클로 보냄
@@ -74,7 +86,7 @@ def main():
         pattern = ('angry', 'disgust', 'fear', 'happy', 'sad', 'surprise', 'neutral')
         
         name = face_reco()
-        emotion = face_emo()
+        # emotion = face_emo()
 
         # print(name)
         # print(emotion)
