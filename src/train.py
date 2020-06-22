@@ -11,33 +11,13 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
 import pickle
 import time
+from contextlib import redirect_stdout
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 from tensorflow.python.client import device_lib
 print(device_lib.list_local_devices())
 
-model = Sequential()
-
-model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48,48,1)))
-model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
-
-model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-model.add(Dropout(0.25))
-
-model.add(Flatten())
-model.add(Dense(1024, activation='relu'))
-model.add(Dropout(0.5))
-model.add(Dense(7, activation='softmax'))
-
-
-
-
-nowtime = time.strftime('%Y%m%d_%H%M', time.localtime(time.time()))
 
 # plots accuracy and loss curves
 def plot_model_history(model_history):
@@ -51,7 +31,7 @@ def plot_model_history(model_history):
     axs[0].set_title('Model Accuracy')
     axs[0].set_ylabel('Accuracy')
     axs[0].set_xlabel('Epoch')
-    axs[0].set_xticks(np.arange(1,len(model_history.history['accuracy'])+1),len(model_history.history['accuracy'])/10)
+#     axs[0].set_xticks(np.arange(1,len(model_history.history['accuracy'])+1),len(model_history.history['accuracy'])/10)
     axs[0].legend(['train', 'val'], loc='best')
     # summarize history for loss
     axs[1].plot(range(1,len(model_history.history['loss'])+1),model_history.history['loss'])
@@ -59,12 +39,31 @@ def plot_model_history(model_history):
     axs[1].set_title('Model Loss')
     axs[1].set_ylabel('Loss')
     axs[1].set_xlabel('Epoch')
-    axs[1].set_xticks(np.arange(1,len(model_history.history['loss'])+1),len(model_history.history['loss'])/10)
+#     axs[1].set_xticks(np.arange(1,len(model_history.history['loss'])+1),len(model_history.history['loss'])/10)
     axs[1].legend(['train', 'val'], loc='best')
     fig.savefig(f'models/{nowtime}_log.png')
 
 
+nowtime = time.strftime('%Y%m%d_%H%M', time.localtime(time.time()))
+
 # If you want to train the same model or try other models, go for this
+model = Sequential()
+
+model.add(Conv2D(32, kernel_size=(5, 5), activation='elu', input_shape=(48,48,1)))
+model.add(Conv2D(64, kernel_size=(4, 4), activation='elu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.4))
+
+model.add(Conv2D(128, kernel_size=(3, 3), activation='elu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Conv2D(128, kernel_size=(3, 3), activation='elu'))
+model.add(MaxPooling2D(pool_size=(2, 2)))
+model.add(Dropout(0.4))
+
+model.add(Flatten())
+model.add(Dense(1024, activation='elu'))
+model.add(Dropout(0.5))
+model.add(Dense(7, activation='softmax'))
 
 # Define data generators
 train_dir = 'data/train'
@@ -72,8 +71,8 @@ val_dir = 'data/test'
 
 num_train = 28709
 num_val = 7178
-batch_size = 64
-num_epoch = 1
+batch_size = 16
+num_epoch = 50
 
 train_datagen = ImageDataGenerator(rescale=1./255)
 val_datagen = ImageDataGenerator(rescale=1./255)
