@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
 from time import sleep
+#import serial
 
 
 def setPinConfig(EN, INA, INB):
@@ -39,19 +40,48 @@ def setMotor(ch, speed, stat):
 def Rot(speed, time):
 
     if speed > 0:
+        print('move head leftward')
         setMotor(CH1, speed, FORWARD)
         setMotor(CH2, speed, BACKWARD)
         sleep(time)
 
-    elif speed < 0:    
-        setMotor(CH1, speed, BACKWARD)
-        setMotor(CH2, speed, FORWARD)
+    elif speed < 0:
+        print('move head rightward')
+        setMotor(CH1, -speed, BACKWARD)
+        setMotor(CH2, -speed, FORWARD)
         sleep(time)
 
     else:    
         setMotor(CH1, 0, STOP)
         setMotor(CH2, 0, STOP)
         sleep(time)
+        
+    setMotor(CH1, 0, STOP)
+    setMotor(CH2, 0, STOP)
+#    sleep(time*0.5)
+
+def Go(speed, time):
+
+    if speed > 0:
+        print('move head leftward')
+        setMotor(CH1, speed, FORWARD)
+        setMotor(CH2, speed, FORWARD)
+        sleep(time)
+
+    elif speed < 0:
+        print('move head rightward')
+        setMotor(CH1, -speed, BACKWARD)
+        setMotor(CH2, -speed, BACKWARD)
+        sleep(time)
+
+    else:    
+        setMotor(CH1, 0, STOP)
+        setMotor(CH2, 0, STOP)
+        sleep(time)
+        
+    setMotor(CH1, 0, STOP)
+    setMotor(CH2, 0, STOP)
+    sleep(time*0.5)
         
 def Servo(error_Now, time, past_dc, error_Sum, error_Prev):
     
@@ -60,24 +90,42 @@ def Servo(error_Now, time, past_dc, error_Sum, error_Prev):
     global head_interval
     
     Kp = 1
-    Ki = 0.1
-    Kd = 0.01
+    Ki = 0
+    Kd = 0
 
     error = error_Now
     error_sum = error_Sum + error
-    error_diff = (error-error_Prev)/interval
+    error_diff = (error-error_Prev)/time
 
-    ctrlval = Kp*error + Ki*error_sum*interval + Kd*error_diff
+    ctrlval = -(Kp*error + Ki*error_sum*time + Kd*error_diff)
     
-    if abs(ctrlval) < 0.1:
+    if abs(ctrlval) < 0.25:
         ctrlval = 0
     
-    elif abs(ctrlval) > 5:
-        ctrlval = 5
+    elif abs(ctrlval) > 2:
+        ctrlval = 2
+        
+    if ctrlval > 0:
+        print('move head upward')
+    elif ctrlval < 0:
+        print('move head downward')
+        
+#    ctrlval = round(ctrlval)
+            
+    head_duty = past_dc - head_interval * ctrlval
     
-    head_duty = past_dc + head_interval * ctrlval
+    if head_duty < head_mindc:
+        head_duty = head_mindc
+        
+    elif head_duty > head_maxdc:
+        head_duty = head_maxdc
+        
+    print(head_duty)
     
-    head.ChangeDutyCycle(head_duty)
+    if head_duty == past_dc:
+        print('steady')
+    else:
+        head.ChangeDutyCycle(head_duty)
     
     return head_duty
     
@@ -85,26 +133,66 @@ def Servo(error_Now, time, past_dc, error_Sum, error_Prev):
 def MPIDCtrl(error_Now, interval, error_Sum, error_Prev):          # While 문 돌아갈 때 변수선언 필요 - error_Sum은 현재까지 error 합, error_Prev은 이전 error
 
     # Gain Values
-    Kp = 1
-    Ki = 0.1
-    Kd = 0.01
+    Kp = 0.6
+    Ki = 0
+    Kd = 0.05
 
     error = error_Now
     error_sum = error_Sum + error
     error_diff = (error-error_Prev)/interval
 
-    speed = 100 * (Kp*error + Ki*error_sum*interval + Kd*error_diff)
+    speed = -100 * (Kp*error + Ki*error_sum*interval + Kd*error_diff)
 
     if speed > 100:
         speed = 100
 
     elif speed < -100:
         speed = -100
+        
+    elif 10 < speed < 40:
+        speed = 40
+        
+    elif -40 < speed < -10:
+        speed = -40
 
-    elif abs(speed) < 20:
+    if abs(speed) < 10:
         speed = 0
-
+    
     Rot(speed, interval)
+
+# def Angry():
+#     ser.write(b"Angry\n")
+#     #Angry 해당되는 motion
+# 
+# def Sad():
+#     ser.write(b"Sad\n")
+#     #Sad 해당되는 motion
+# 
+# def Happy():
+#     ser.write(b"Happy\n")
+#     #Angry 해당되는 motion
+# 
+# def Disgust():
+#     ser.write(b"Disgust\n")
+#     #Sad 해당되는 motion
+# 
+# def Fear():
+#     ser.write(b"Fear\n")
+#     #Angry 해당되는 motion
+# 
+# def Surprised():
+#     ser.write(b"Surprised\n")
+#     #Sad 해당되는 motion
+# 
+# def Neutral():
+#     ser.write(b"Neutral\n")
+#     #Angry 해당되는 motion
+# 
+# def Sad():
+#     ser.write(b"Sad\n")
+#     #Sad 해당되는 motion
+
+    
 
 
 #Motor Status
@@ -131,9 +219,9 @@ IN3 = 6  #pin 31
 IN4 = 5  #pin 29
 
 # servo bound
-head_mindc = 3.3
-head_maxdc = 16
-head_interval = (head_maxdc - head_mindc)/20
+head_mindc = 1
+head_maxdc = 5
+head_interval = (head_maxdc - head_mindc)/10
 
         
 GPIO.setmode(GPIO.BCM)
@@ -144,29 +232,29 @@ pwmB = setPinConfig(ENB, IN3, IN4)
 GPIO.setup(24, GPIO.OUT)
 head = GPIO.PWM(24, 50) #pin no 18 bcm24 head
 head.start(head_mindc)
+print('ready')
 
 
+#ser = serial.Serial('/dev/ttyACM0', 9600, timeout = 1) #Port 확인, TIMEOUT 수정
+#ser.flush()
 
 
 #Control example
-
-setMotor(CH1, 80, FORWARD)
-setMotor(CH2, 80, FORWARD)
-
-sleep(5)
-
-setMotor(CH1, 40, BACKWARD)
-setMotor(CH2, 40, FORWARD)
-sleep(5)
-
-setMotor(CH1, 100, BACKWARD)
-setMotor(CH2, 100, BACKWARD)
-sleep(5)
-
-setMotor(CH1, 40, STOP)
-setMotor(CH2, 40, STOP)
-
-GPIO.cleanup()
-    
-
-
+# 
+# setMotor(CH1, 80, FORWARD)
+# setMotor(CH2, 80, FORWARD)
+# 
+# sleep(5)
+# 
+# setMotor(CH1, 40, BACKWARD)
+# setMotor(CH2, 40, FORWARD)
+# sleep(5)
+# 
+# setMotor(CH1, 100, BACKWARD)
+# setMotor(CH2, 100, BACKWARD)
+# sleep(5)
+# 
+# setMotor(CH1, 40, STOP)
+# setMotor(CH2, 40, STOP)
+# 
+# GPIO.cleanup()

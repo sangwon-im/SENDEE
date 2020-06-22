@@ -1,83 +1,100 @@
 import cv2
-import face_recognition
 import pickle
+# import motordrive
+# import RPi.GPIO as GPIO
+import time
+import numpy as np
 
-HEIGHT = 120
-WIDTH =  160
+HEIGHT = 360
+WIDTH =  480
 
 capture = cv2.VideoCapture(-1)
 capture.set(3, WIDTH)
 capture.set(4, HEIGHT)
-# capture.set(5, 5)
+capture.set(10, 80) #brightness
+capture.set(11, 60) #contrast
+capture.set(21, 0.25) #auto exposure
+#capture.set(5, 60)
 
-#직전 값과, 지금까지의 누적 값
-def face_tracking(x_pos, y_pos):
-    if x_pos > 0.1: #카메라 입장에서 오른쪽
-        print('move head rightward')
-        #speed 를 x_pos의 절대값에 비례하도록
-    elif x_pos < -0.1:
-        print('move head leftward')
-    if y_pos > 0.1:
-        print('move head upward')
-    elif y_pos < -0.1:
-        print('move head downward')
-    #얼마나 떨어져 있는지에 따라서 속도 다르게? PID 제어?
+hor_error_Sum = 0
+hor_error_Prev = 0
+ver_error_Sum = 0
+ver_error_Prev = 0
+past_dc = 0
+##########
 
-count = 1
+face_cascade = cv2.CascadeClassifier('haar/haarcascade_frontalface_alt2.xml')
+info = ''
+font = cv2.FONT_HERSHEY_SIMPLEX
+
+count = 0
 speed = 10
 
 while True:
+    start = time.time()  # 시작 시간 저장
     ret, frame = capture.read()
     if not ret: break
 
     rgb_for_face = frame[::]
-    face_locations = face_recognition.face_locations(rgb_for_face)
-    print("number of people: ", len(face_locations))
     gray_for_emotion = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
+    faces = face_cascade.detectMultiScale(gray_for_emotion, 1.3, 5)
+
+    cv2.putText(frame, info, (5, 15), font, 0.5, (255, 0, 255), 1)
+
     #############10프레임에 한번 시행되는 부분###############
-    if count%speed == 0:
+    if count==speed:
         #rgb 이미지 피클로 저장, 얼굴인식
         with open("pkl/rgb_for_face.pkl", "wb") as file:
             pickle.dump(rgb_for_face, file) 
         #gray 이미지 피클로 저장, 표정
         with open("pkl/gray_for_emotion.pkl", "wb") as file:
             pickle.dump(gray_for_emotion, file)
-        count = 1
+        count = 0
+
     else:
         count += 1
-    ######################################
-    #얼굴 위치 피클로 저장, 한명만 저장인데 먼저 인식된? 
+    ###################################################
     
+    if len(faces)>1:
+        faces=faces[:1]
 
-    ##########################################3
-    #추가해야할 것, 얼굴 큰 사람이 인식되게끔!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if len(face_locations)==0:
-        pass
-    elif len(face_locations)>1:
-        face_locations=[face_locations[0]]
-    with open("pkl/face_locations.pkl", "wb") as file:
-        pickle.dump(face_locations, file)
-    #########################################
+    if len(faces)==1:
+        for (x, y, w, h) in faces:
+            face_locations = np.array([[y, x+w, y+h, x]])
+            (top, right, bottom, left) = (y, x+w, y+h, x)
+            cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
+            
+            # print(face_locations)
+            # print(faces)
 
-    for (top, right, bottom, left) in face_locations:
-        x_pos = (right+left)/2
-        y_pos = (top+bottom)/2
+            with open("pkl/face_locations.pkl", "wb") as file:
+                pickle.dump(face_locations, file)
+            
+            # cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+            # cv2.putText(frame, 'Detected Face', (x-5, y-5), font, 0.5, (255, 255, 0), 2)
+            
+            x_pos = x + w/2
+            y_pos = y + h/2
 
-        x_pos = (x_pos - (WIDTH/2)) / WIDTH *2 +0.1
-        y_pos = -(y_pos - (HEIGHT/2)) / HEIGHT *2
+            x_pos = 2 * (x_pos - WIDTH/2) / WIDTH
+            y_pos = -2 * (y_pos - (HEIGHT/2)) / HEIGHT
 
-        #두명이 인식되면, 먼저 인식된 사람 순으로?
-        #아니면 더 큰 쪽으로 인식이 가능한가?
-        print("x", x_pos," y:", y_pos)
+            # print("x", x_pos," y:", y_pos)
 
-        ##파일로 쏘지 말고 여기서 모터 구동을 제어하자!
-        face_tracking(x_pos, y_pos)
-
-        cv2.rectangle(frame, (left, top), (right, bottom), (0,0,255), 2)
-
+            ###########
+            hor_error_Sum = hor_error_Sum + x_pos
+            ver_error_Sum = ver_error_Sum + y_pos
+            # motordrive.MPIDCtrl(x_pos, 0.03, hor_error_Sum, hor_error_Prev)
+            # past_dc = motordrive.Servo(y_pos, 0.05, past_dc, ver_error_Sum, ver_error_Prev)
+            # 0.1 sec movememt
+            hor_error_Prev = x_pos
+            ver_error_Prev = y_pos
+            ###########
+    frame = cv2.flip(frame, 1)
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) == ord('q'): break
 
+    # print("time :", time.time() - start)
 capture.release()
 cv2.destroyAllWindows()
