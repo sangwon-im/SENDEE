@@ -104,34 +104,34 @@ def face_emo(model):
 model = md.model_basic()
 model.load_weights('models/model.h5')
 
-cycle_time = 5
+cycle_time = 1
 
 while True:
-    # try:
-    start = time.time() 
-    emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
-    
-    emotion = face_emo(model)
-    print(emotion_dict[np.argmax(emotion)])
-    
-    name = face_reco()
-    print(name)
-    ###################### 행동 #####################################
-    
+    try:
+        start = time.time() 
+        emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
+        
+        emotion = face_emo(model)
+        print(emotion_dict[np.argmax(emotion)])
+        
+        name = face_reco()
+        print(name)
+        ###################### 행동 #####################################
+        
 
 
 
-    ################################################################
-    
-    #코드 실행 시간
-    print("time :", (time.time() - start), "\n") 
-    
-    #cycle_time 초마다 한번 실행
-    if (time.time() - start) < cycle_time:
-        time.sleep(cycle_time - (time.time() - start))
+        ################################################################
+        
+        #코드 실행 시간
+        print("time :", (time.time() - start), "\n") 
+        
+        #cycle_time 초마다 한번 실행
+        if (time.time() - start) < cycle_time:
+            time.sleep(cycle_time - (time.time() - start))
 
-    # except EOFError:
-    #     pass
+    except EOFError:
+        pass
 
 
 
