@@ -1,7 +1,7 @@
 import cv2
 import pickle
-# import motordrive
-# import RPi.GPIO as GPIO
+import motordrive
+import RPi.GPIO as GPIO
 import time
 import numpy as np
 
@@ -11,8 +11,8 @@ WIDTH =  480
 capture = cv2.VideoCapture(-1)
 capture.set(3, WIDTH)
 capture.set(4, HEIGHT)
-capture.set(10, 50) #brightness
-capture.set(11, 50) #contrast
+capture.set(10, 60) #brightness
+capture.set(11, 60) #contrast
 capture.set(21, 0.25) #auto exposure
 #capture.set(5, 60)
 
@@ -20,7 +20,7 @@ hor_error_Sum = 0
 hor_error_Prev = 0
 ver_error_Sum = 0
 ver_error_Prev = 0
-past_dc = 0
+past_dc = 4
 ##########
 
 face_cascade = cv2.CascadeClassifier('haar/haarcascade_frontalface_alt2.xml')
@@ -29,8 +29,9 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 
 count = 0
 speed = 10
+isSleep = False
 
-cycle_time = 0.05
+cycle_time = 0.05 #1프레임당 시간
 
 while True:
     start = time.time()  # 시작 시간 저장
@@ -54,7 +55,7 @@ while True:
         with open("pkl/gray_for_emotion.pkl", "wb") as file:
             pickle.dump(gray_for_emotion, file)
             file.close()
-        print("write!")
+        # print("write!")
         count = 0
 
     else:
@@ -65,6 +66,7 @@ while True:
         faces=faces[:1]
 
     if len(faces)==1:
+        isSleep = False
         for (x, y, w, h) in faces:
             face_locations = np.array([[y, x+w, y+h, x]])
             (top, right, bottom, left) = (y, x+w, y+h, x)
@@ -91,12 +93,19 @@ while True:
             ###########
             hor_error_Sum = hor_error_Sum + x_pos
             ver_error_Sum = ver_error_Sum + y_pos
-            # motordrive.MPIDCtrl(x_pos, 0.03, hor_error_Sum, hor_error_Prev)
-            # past_dc = motordrive.Servo(y_pos, 0.05, past_dc, ver_error_Sum, ver_error_Prev)
+            motordrive.MPIDCtrl(x_pos, 0.05, hor_error_Sum, hor_error_Prev)
+            past_dc = motordrive.Servo(y_pos, 0.05, past_dc, ver_error_Sum, ver_error_Prev)
             # 0.1 sec movememt
             hor_error_Prev = x_pos
             ver_error_Prev = y_pos
             ###########
+    else:     # No face detected
+        if not isSleep:
+            motordrive.headsleep()
+            isSleep = True
+        else:
+            motordrive.headsleep()
+            print('ZZZ...')
 
     frame = cv2.flip(frame, 1)
     cv2.imshow('frame', frame)
@@ -108,3 +117,4 @@ while True:
 
 capture.release()
 cv2.destroyAllWindows()
+GPIO.cleanup()
