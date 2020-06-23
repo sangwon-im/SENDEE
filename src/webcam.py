@@ -11,8 +11,8 @@ WIDTH =  480
 capture = cv2.VideoCapture(-1)
 capture.set(3, WIDTH)
 capture.set(4, HEIGHT)
-capture.set(10, 80) #brightness
-capture.set(11, 60) #contrast
+capture.set(10, 50) #brightness
+capture.set(11, 50) #contrast
 capture.set(21, 0.25) #auto exposure
 #capture.set(5, 60)
 
