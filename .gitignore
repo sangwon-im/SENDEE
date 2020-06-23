@@ -3,3 +3,7 @@ src/data/train/**
 
 src/.vscode/
 src/__pycache__
+
+src/pkl/gray_for_emotion.pkl
+src/pkl/face_locations/pkl
+src/pkl/rgb_for_face.pkl

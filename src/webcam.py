@@ -30,6 +30,8 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 count = 0
 speed = 10
 
+cycle_time = 0.05
+
 while True:
     start = time.time()  # 시작 시간 저장
     ret, frame = capture.read()
@@ -47,9 +49,12 @@ while True:
         #rgb 이미지 피클로 저장, 얼굴인식
         with open("pkl/rgb_for_face.pkl", "wb") as file:
             pickle.dump(rgb_for_face, file) 
+            file.close()
         #gray 이미지 피클로 저장, 표정
         with open("pkl/gray_for_emotion.pkl", "wb") as file:
             pickle.dump(gray_for_emotion, file)
+            file.close()
+        print("write!")
         count = 0
 
     else:
@@ -70,6 +75,7 @@ while True:
 
             with open("pkl/face_locations.pkl", "wb") as file:
                 pickle.dump(face_locations, file)
+                file.close()
             
             # cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
             # cv2.putText(frame, 'Detected Face', (x-5, y-5), font, 0.5, (255, 255, 0), 2)
@@ -91,10 +97,14 @@ while True:
             hor_error_Prev = x_pos
             ver_error_Prev = y_pos
             ###########
+
     frame = cv2.flip(frame, 1)
     cv2.imshow('frame', frame)
     if cv2.waitKey(1) == ord('q'): break
 
-    # print("time :", time.time() - start)
+    print("time :", time.time() - start)
+    if (time.time() - start) < cycle_time:
+        time.sleep(cycle_time - (time.time() - start))
+
 capture.release()
 cv2.destroyAllWindows()
