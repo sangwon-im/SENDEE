@@ -2,7 +2,6 @@ import RPi.GPIO as GPIO
 from time import sleep
 #import serial
 
-
 def setPinConfig(EN, INA, INB):
     GPIO.setup(EN, GPIO.OUT)
     GPIO.setup(INA, GPIO.OUT)
@@ -40,13 +39,13 @@ def setMotor(ch, speed, stat):
 def Rot(speed, time):
 
     if speed > 0:
-        print('move head leftward')
+        #print('move head leftward')
         setMotor(CH1, speed, FORWARD)
         setMotor(CH2, speed, BACKWARD)
         sleep(time)
 
     elif speed < 0:
-        print('move head rightward')
+        #print('move head rightward')
         setMotor(CH1, -speed, BACKWARD)
         setMotor(CH2, -speed, FORWARD)
         sleep(time)
@@ -89,8 +88,8 @@ def Servo(error_Now, time, past_dc, error_Sum, error_Prev):
     global head_maxdc 
     global head_interval
     
-    Kp = 1
-    Ki = 0
+    Kp = 0.4
+    Ki = 0.3
     Kd = 0
 
     error = error_Now
@@ -99,18 +98,10 @@ def Servo(error_Now, time, past_dc, error_Sum, error_Prev):
 
     ctrlval = -(Kp*error + Ki*error_sum*time + Kd*error_diff)
     
-    if abs(ctrlval) < 0.25:
+    if abs(ctrlval) < 0.2:
         ctrlval = 0
-    
-    elif abs(ctrlval) > 2:
-        ctrlval = 2
         
-    if ctrlval > 0:
-        print('move head upward')
-    elif ctrlval < 0:
-        print('move head downward')
-        
-#    ctrlval = round(ctrlval)
+    ctrlval = round(ctrlval, 1)
             
     head_duty = past_dc - head_interval * ctrlval
     
@@ -120,12 +111,15 @@ def Servo(error_Now, time, past_dc, error_Sum, error_Prev):
     elif head_duty > head_maxdc:
         head_duty = head_maxdc
         
-    print(head_duty)
+    print('ctrlval',ctrlval)
     
-    if head_duty == past_dc:
+    if abs(head_duty - past_dc) < 0.04:
         print('steady')
+        head_duty = past_dc
     else:
+        head.start(head_duty)
         head.ChangeDutyCycle(head_duty)
+        print('head duty', head_duty)
     
     return head_duty
     
@@ -159,6 +153,69 @@ def MPIDCtrl(error_Now, interval, error_Sum, error_Prev):          # While 문 �
         speed = 0
     
     Rot(speed, interval)
+    
+    
+def shake(prev_angle, cycle):
+    for i in range(0, cycle):
+        left.ChangeDutyCycle(left_mindc + (prev_angle + 1) * left_interval)
+        right.ChangeDutyCycle(right_mindc + prev_angle * right_interval)
+        sleep(0.02)
+        left.ChangeDutyCycle(left_mindc + prev_angle * left_interval)
+        right.ChangeDutyCycle(right_mindc + (prev_angle + 1) * right_interval)
+        sleep(0.02)
+    
+def movetogether(prev_angle, goal_angle, speed): # angle: 0-20, speed:1,2,3,5
+    
+    left_status = left_mindc + left_interval * prev_angle
+    right_status = right_mindc + right_interval * prev_angle
+    
+    stptime = 30/speed
+    left_step = left_interval * (goal_angle - prev_angle) / stptime
+    right_step = right_interval * (goal_angle - prev_angle) / stptime
+    
+    for i in range(0, int(stptime)):
+        left.ChangeDutyCycle(left_status + left_step * i)
+        right.ChangeDutyCycle(right_status + right_step * i)
+        sleep(0.02)
+        
+    return goal_angle
+
+def moveopposite(prev_angle, amount, speed):
+    
+    left_status = left_mindc + left_interval * prev_angle
+    right_status = right_mindc + right_interval * prev_angle
+    
+    stptime = 30/speed
+    
+    left_goal = (left_interval * amount)/stptime
+    right_goal = (right_interval * amount)/stptime
+    
+    for i in range(0, int(stptime)):
+        left.ChangeDutyCycle(left_status - left_goal * i)
+        right.ChangeDutyCycle(right_status + right_goal * i)
+        sleep(0.02)
+        
+    for i in range(1, int(stptime) + 1):
+        left.ChangeDutyCycle(left_status + left_goal * (i - int(stptime)))
+        right.ChangeDutyCycle(right_status + right_goal * (int(stptime) - i))
+        sleep(0.02)
+        
+    sleep(0.02)
+    return prev_angle
+    
+def headmove(prev_angle, goal_angle, speed):
+             
+    head_status = head_mindc + head_interval * prev_angle
+    
+    stptime = 30/speed
+    head_step = head_interval * (goal_angle - prev_angle) / stptime
+    
+    for i in range(0, int(stptime)):
+        head.ChangeDutyCycle(head_status + head_step * i)
+        sleep(0.02)
+        
+    return goal_angle
+
 
 # def Angry():
 #     ser.write(b"Angry\n")
@@ -192,9 +249,6 @@ def MPIDCtrl(error_Now, interval, error_Sum, error_Prev):          # While 문 �
 #     ser.write(b"Sad\n")
 #     #Sad 해당되는 motion
 
-    
-
-
 #Motor Status
 STOP = 0
 FORWARD = 1
@@ -219,9 +273,9 @@ IN3 = 6  #pin 31
 IN4 = 5  #pin 29
 
 # servo bound
-head_mindc = 1
-head_maxdc = 5
-head_interval = (head_maxdc - head_mindc)/10
+head_mindc = 2.8
+head_maxdc = 7
+head_interval = (head_maxdc - head_mindc)/16
 
         
 GPIO.setmode(GPIO.BCM)
@@ -232,29 +286,39 @@ pwmB = setPinConfig(ENB, IN3, IN4)
 GPIO.setup(24, GPIO.OUT)
 head = GPIO.PWM(24, 50) #pin no 18 bcm24 head
 head.start(head_mindc)
-print('ready')
+print('head ready')
 
 
-#ser = serial.Serial('/dev/ttyACM0', 9600, timeout = 1) #Port 확인, TIMEOUT 수정
-#ser.flush()
+right_mindc = 4.5
+right_maxdc = 10.7
+right_interval = (right_maxdc - right_mindc)/16
+
+left_mindc = 11
+left_maxdc = 3
+left_interval = (left_maxdc - left_mindc)/16
+
+# percent
+
+GPIO.setup(27, GPIO.OUT)
+GPIO.setup(22, GPIO.OUT)
+left = GPIO.PWM(27, 50)
+right = GPIO.PWM(22, 50)
+
+left.start(left_mindc)
+right.start(right_mindc)
+print('arm ready')
 
 
 #Control example
-# 
-# setMotor(CH1, 80, FORWARD)
-# setMotor(CH2, 80, FORWARD)
-# 
-# sleep(5)
-# 
-# setMotor(CH1, 40, BACKWARD)
-# setMotor(CH2, 40, FORWARD)
-# sleep(5)
-# 
-# setMotor(CH1, 100, BACKWARD)
-# setMotor(CH2, 100, BACKWARD)
-# sleep(5)
-# 
-# setMotor(CH1, 40, STOP)
-# setMotor(CH2, 40, STOP)
-# 
-# GPIO.cleanup()
+    
+prev_angle = 0
+head_angle = 0
+
+while True:
+    
+    prev_angle = movetogether(prev_angle, 10, 3)
+    head_angle = headmove(head_angle, 3, 5)
+    prev_angle = movetogether(prev_angle, 11, 3)
+    head_angle = headmove(head_angle, 5, 5)
+    
+GPIO.cleanup()

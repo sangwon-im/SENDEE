@@ -6,7 +6,6 @@
 #메인 함수는 0.1초 단위로 돈다, 따라서 움직임 트래킹은 웹캠단에서 처리해야 한다.
 
 import time
-# import tkinter
 import pickle
 import cv2
 import face_recognition
@@ -14,11 +13,14 @@ import os
 from keras.utils import np_utils
 from keras.datasets import mnist
 from keras.models import Sequential
-from keras.layers import Dense, Activation
-import numpy as np
-from numpy import argmax
 from keras.models import load_model
-import os
+from keras.layers import Dense, Activation, BatchNormalization
+import numpy as np
+
+import model as md
+# import motordrive
+import display
+
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
@@ -39,25 +41,31 @@ def img2encoding():
 
     with open("pkl/known_face_names.pkl", "wb") as file:
         pickle.dump(known_face_names, file)
+        file.close()
     with open("pkl/known_face_encodings.pkl", "wb") as file:
         pickle.dump(known_face_encodings, file)
+        file.close()
 
 
 def face_reco():
     ##rgb_for_face 불러오기
     with open("pkl/rgb_for_face.pkl", "rb") as file:
         rgb_for_face = pickle.load(file)
+        file.close()
     ##face_locations 불러오기
     with open("pkl/face_locations.pkl", "rb") as file:
         face_location = pickle.load(file)
+        file.close()
     
     ##불러온 파일 이용해서 인코딩 구한다
     face_encoding = face_recognition.face_encodings(rgb_for_face, face_location, num_jitters=1)
 
     with open("pkl/known_face_names.pkl", "rb") as file:
         known_face_names = pickle.load(file)
+        file.close()
     with open("pkl/known_face_encodings.pkl", "rb") as file:
         known_face_encodings = pickle.load(file)
+        file.close()
 
     matches = face_recognition.compare_faces(known_face_encodings, face_encoding[0])
 
@@ -69,14 +77,16 @@ def face_reco():
     return name
 
 
-def face_emo():
+def face_emo(model):
     with open("pkl/gray_for_emotion.pkl", "rb") as file:
         gray_for_emotion = pickle.load(file)
+        file.close()
     with open("pkl/face_locations.pkl", "rb") as file:
         face_location = pickle.load(file)
+        file.close()
 
-    model = load_model("models/20200622_2242_model.h5")
-    
+    # model = load_model("models/20200622_2242_model.h5")
+    model = model
     # emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
     for (top, right, bottom, left) in face_location:
         roi_gray = gray_for_emotion[top:bottom, left:right]
@@ -87,58 +97,56 @@ def face_emo():
         if len(prediction) != 0:
             prediction = prediction[0]
             prediction = np.rint(prediction/sum(prediction)*100)# %
-            # print(f"angry     : {prediction[0]} %")
-            # print(f"disgusted : {prediction[1]} %")
-            # print(f"fearful   : {prediction[2]} %")
-            # print(f"happy     : {prediction[3]} %")
-            # print(f"neutral   : {prediction[4]} %")
-            # print(f"sad       : {prediction[5]} %")
-            # print(f"surprised : {prediction[6]} %")
             return prediction
-        # maxindex = int(np.argmax(prediction))
-
-    ############################
-
-
-    #감정표현이 들어오면 딜레이를 피클파일에 저장, webcam 파일에서 읽어서 if문, 딜레이동안 webcam py 정지
-    #일시정지 여부를 피클로 보냄
-
-def main():
-    count = 0
-    emo_count = 5
-    #5번 읽은 감정을 평균냄
-    emo_sum = [0,0,0,0,0,0,0]
-    emotion = [0,0,0,0,0,0,0]
-
-    while True:
-        try:
-            # start = time.time() 
-            emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
-            emo = face_emo()
-            emo_sum = emo_sum + emo
-            count += 1
-            # print(dict(zip(list(emotion_dict.values()), list(emotion))))
-
-            #얼굴 인식은 5번마다 한번씩 , 표정 인식은 5번을 평균내서
-            if count == emo_count:
-                emo_sum = emo_sum/emo_count
-                emotion = emo_sum
-                # name = face_reco()
-                # print(name, dict(zip(list(emotion_dict.values()), list(emo_sum))))
         
-                ########### 여기에 행동 넣기 ################
-                print(emotion_dict[np.argmax(emotion)])
-                
 
-                ############################################
 
-                emo_sum = [0,0,0,0,0,0,0]
-                count = 0
+model = md.model_basic()
+model.load_weights('models/model.h5')
+
+cycle_time = 5
+
+while True:
+    # try:
+    start = time.time() 
+    emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
+    
+    emotion = face_emo(model)
+    print(emotion_dict[np.argmax(emotion)])
+    
+    name = face_reco()
+    print(name)
+    ###################### 행동 #####################################
+    
+
+
+
+    ################################################################
+    
+    #코드 실행 시간
+    print("time :", (time.time() - start), "\n") 
+    
+    #cycle_time 초마다 한번 실행
+    if (time.time() - start) < cycle_time:
+        time.sleep(cycle_time - (time.time() - start))
+
+    # except EOFError:
+    #     pass
+
+
+
+
+
+
+    # count = 0
+    # emo_count = 5
+    # #5번 읽은 감정을 평균냄
+    # emo_sum = [0,0,0,0,0,0,0]
+    # emotion = [0,0,0,0,0,0,0]
+
+
+        # print("time :", time.time() - start) #코드 실행 시간
         
-        except EOFError:
-            pass
-        # except tensorflow.python.framework.errors_impl.ResourceExhaustedError:
-            # pass
         
         # emotion_dict[np.argmax(emotion)]
 
@@ -158,9 +166,21 @@ def main():
         # face_emo()
         # time.sleep(0.5)
 
-        # print("time :", time.time() - start) #코드 실행 시간
-        
-# main()
-main()
+        # emo_sum = emo_sum + emo
+        # count += 1
+        # #얼굴 인식은 5번마다 한번씩 , 표정 인식은 5번을 평균내서
+        # if count == emo_count:
+        #     emo_sum = emo_sum/emo_count
+        #     emotion = emo_sum
+        #     name = face_reco()
+        #     # print(name, dict(zip(list(emotion_dict.values()), list(emo_sum))))
+    
+        #     ########### 여기에 행동 넣기 ################
+        #     print(name)
+        #     print(emotion_dict[np.argmax(emotion)])
+            
 
- 
+        #     ############################################
+
+        #     emo_sum = [0,0,0,0,0,0,0]
+        #     count = 0

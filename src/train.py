@@ -3,7 +3,8 @@ import argparse
 import matplotlib.pyplot as plt
 import cv2
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Flatten, BatchNormalization
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import BatchNormalization
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import MaxPooling2D
@@ -13,6 +14,7 @@ import os
 import pickle
 import time
 from contextlib import redirect_stdout
+import model as md
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
@@ -45,10 +47,9 @@ def plot_model_history(model_history):
     fig.savefig(f'models/{nowtime}_log.png')
 
 
-nowtime = time.strftime('%Y%m%d_%H%M', time.localtime(time.time()))
 
 # If you want to train the same model or try other models, go for this
-model = Sequential()
+# model = Sequential()
 
 # model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(48,48,1), data_format='channels_first'))
 # model.add(Conv2D(64, kernel_size=(3, 3), activation='relu', padding='same', input_shape=(48,48,1)))
@@ -81,25 +82,26 @@ model = Sequential()
 # model.add(Dense(4096, activation='relu'))
 # model.add(Dense(4096, activation='relu'))
 # model.add(Dense(7, activation='softmax'))
-def cnn_basic():
-    model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48,48,1)))
-    model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.5))
+# def cnn_basic():
+#     model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48,48,1)))
+#     model.add(Conv2D(64, kernel_size=(3, 3), activation='relu'))
+#     model.add(MaxPooling2D(pool_size=(2, 2)))
+#     model.add(Dropout(0.5))
 
-    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
-    model.add(Dropout(0.5))
+#     model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+#     model.add(MaxPooling2D(pool_size=(2, 2)))
+#     model.add(Conv2D(128, kernel_size=(3, 3), activation='relu'))
+#     model.add(MaxPooling2D(pool_size=(2, 2)))
+#     model.add(Dropout(0.5))
 
-    model.add(Flatten())
-    model.add(Dense(1024, activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(Dense(7, activation='softmax'))
+#     model.add(Flatten())
+#     model.add(Dense(1024, activation='relu'))
+#     model.add(Dropout(0.5))
+#     model.add(Dense(7, activation='softmax'))
 
-    model.compile(loss='categorical_crossentropy',optimizer=Adam(lr=0.0001, decay=1e-6),metrics=['accuracy'])
-
+model = md.model_advanced()
+# model.compile(loss='categorical_crossentropy',optimizer=Adam(lr=0.0001, decay=1e-6),metrics=['accuracy'])
+model.compile(loss='mean_squared_error',optimizer=Adam(lr=0.0001, decay=1e-6),metrics=['accuracy'])
 
 # Define data generators
 train_dir = 'data/train'
@@ -128,9 +130,7 @@ validation_generator = val_datagen.flow_from_directory(
         class_mode='categorical')
 
 
-
-
-early_stopping = EarlyStopping(monitor='val_loss', min_delta=0, patience=10, mode='min') #조기종료
+early_stopping = EarlyStopping(monitor='val_accuracy', min_delta=0, patience=10, mode='max') #조기종료
 
 model_info = model.fit(
     train_generator,
@@ -149,8 +149,11 @@ model_info = model.fit(
 #         epochs=num_epoch,
 #         validation_data=validation_generator,
 #         validation_steps=num_val // batch_size)
+
+nowtime = time.strftime('%Y%m%d_%H%M', time.localtime(time.time()))
+
 plot_model_history(model_info)
-model.save(f'models/{nowtime}_model.h5')
+model.save_weights(f'models/{nowtime}_model.h5')
 
 with open(f'models/{nowtime}_log.txt', 'w') as f:
     f.write("batch_size: %s\n" %batch_size)

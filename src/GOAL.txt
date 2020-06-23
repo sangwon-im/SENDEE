@@ -4,3 +4,57 @@
 10프레임당 한장씩 사진으로 저장
 저장된 사진을 가지고 face recognize, emotion recognize
 
+
+angry
+    아는사람(화냄, 시선 회피, 울음)
+disgust -> (궁금, 회피, 화냄)
+sad -> (위로, 울음)
+fear -> (위로)
+happy -> (웃음, 장난, 춤)
+surprise -> (궁금, 놀람)
+neutral -> (장난, 심심, 졸음)
+
+
+
+행동 셋
+웃음
+웃음 참다가 박장대소
+한숨
+눈 그렁그렁
+벌벌떨다 눈껌벅
+같이 화냄
+깜짝 땀흘림
+꺄아악
+내가 널 지켜줄게
+
+
+if 초면
+    if angry
+
+    if disgusted
+
+    if fearful
+
+    if happy
+
+    if neutral
+
+    if sad
+
+    if surprise
+
+if 구면
+    if angry
+
+    if disgusted
+
+    if fearful
+
+    if happy
+
+    if neutral
+
+    if sad
+
+    if surprise
+    
