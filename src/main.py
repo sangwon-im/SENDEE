@@ -75,13 +75,14 @@ def face_emo():
     with open("pkl/face_locations.pkl", "rb") as file:
         face_location = pickle.load(file)
 
-    model = load_model("models/20200622_2012_model.h5")
+    model = load_model("models/20200622_2242_model.h5")
     
     # emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
     for (top, right, bottom, left) in face_location:
         roi_gray = gray_for_emotion[top:bottom, left:right]
         cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
         prediction = model.predict(cropped_img)
+        cv2.imwrite('cropped.png', roi_gray)
         
         if len(prediction) != 0:
             prediction = prediction[0]
@@ -96,11 +97,9 @@ def face_emo():
             return prediction
         # maxindex = int(np.argmax(prediction))
 
-
-
     ############################
 
-    # cv2.imwrite('gray.png',gray_for_emotion)
+
     #감정표현이 들어오면 딜레이를 피클파일에 저장, webcam 파일에서 읽어서 if문, 딜레이동안 webcam py 정지
     #일시정지 여부를 피클로 보냄
 
@@ -126,16 +125,12 @@ def main():
                 emotion = emo_sum
                 # name = face_reco()
                 # print(name, dict(zip(list(emotion_dict.values()), list(emo_sum))))
-                #초기화
-
+        
                 ########### 여기에 행동 넣기 ################
                 print(emotion_dict[np.argmax(emotion)])
-
-
-
+                
 
                 ############################################
-
 
                 emo_sum = [0,0,0,0,0,0,0]
                 count = 0
