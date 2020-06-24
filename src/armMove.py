@@ -9,6 +9,5 @@ while True:
 
         motordrive.emoreact(emotion)
 
-        time.sleep(0.1)
     except EOFError:
         pass
