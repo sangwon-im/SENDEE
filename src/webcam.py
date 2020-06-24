@@ -100,7 +100,7 @@ while True:
         x_pos = x + w/2
         y_pos = y + h/2
 
-        x_pos = 2 * (x_pos - WIDTH/2) / WIDTH
+        x_pos = 2 * (x_pos - WIDTH/2) / WIDTH + 0.1
         y_pos = -2 * (y_pos - (HEIGHT/2)) / HEIGHT
 
         ###########
