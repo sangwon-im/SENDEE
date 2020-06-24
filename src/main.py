@@ -18,7 +18,6 @@ from keras.layers import Dense, Activation, BatchNormalization
 import numpy as np
 
 import model as md
-import motordrive
 import display
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -39,8 +38,6 @@ def img2encoding():
         image_encoding = face_recognition.face_encodings(name_image)[0]
         
         known_face_encodings.append(image_encoding)
-    print(known_face_names)
-    print(known_face_encodings)
     # names_encodings = dict(zip(known_face_names, known_face_encodings))
 
     with open("pkl/known_face_names.pkl", "wb") as file:
@@ -110,7 +107,6 @@ model.load_weights('models/model.h5')
 
 cycle_time = 1
 
-prediction_sum = [0,0,0,0,0,0,0]
 
 while True:
     try:
@@ -131,22 +127,21 @@ while True:
             # prediction_sum = [0,0,0,0,0,0,0]
 
             prediction = face_emo(model)
-
             emotion = emotion_dict[np.argmax(prediction)]
             print(emotion)
 
             name = face_reco()
             print(name)
             ###################### 행동 #####################################
-            onprocess = True
-            with open("pkl/onprocess.pkl", "wb") as file:
-                pickle.dump(onprocess, file)
+            # onprocess = True
+            # with open("pkl/onprocess.pkl", "wb") as file:
+            #     pickle.dump(onprocess, file)
 
             display.emo2reaction(emotion, name)  ##unknown sangwon 
 
-            onprocess = False
-            with open("pkl/onprocess.pkl", "wb") as file:
-                pickle.dump(onprocess, file)
+            # onprocess = False
+            # with open("pkl/onprocess.pkl", "wb") as file:
+            #     pickle.dump(onprocess, file)
             ################################################################
         else: #인식이 안된 상태
             #######################

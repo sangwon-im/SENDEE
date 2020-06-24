@@ -1,7 +1,7 @@
 import cv2
 import time
 import random
-import motordrive
+# import motordrive
 
 def display(filename, name, emotion):
     # motordrive.emoreact(filename)
