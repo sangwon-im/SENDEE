@@ -13,9 +13,9 @@ def display(filename, name, emotion):
         #뉴트럴만 좀 빨리 재생하도록
         #프레임당 33ms 기다리고 다음 프레임 재생
         if filename == "neutral1":
-            cv2.waitKey(11)
+            cv2.waitKey(5)
         else:
-            cv2.waitKey(33)
+            cv2.waitKey(15)
 
         ##인식 되고, 알때
         ##인식 되고, 모를때
