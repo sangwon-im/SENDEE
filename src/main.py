@@ -32,11 +32,15 @@ def img2encoding():
     images = os.listdir("img/")
     for image in images:
         image_name = image.split('.')[0]
+        print(image_name)
         known_face_names.append(image_name)
         
-        image_encoding = face_recognition.face_encodings(face_recognition.load_image_file(f"img/{image_name}.jpg"))[0]
+        name_image = face_recognition.load_image_file(f"img/{image_name}.jpg")
+        image_encoding = face_recognition.face_encodings(name_image)[0]
+        
         known_face_encodings.append(image_encoding)
-
+    print(known_face_names)
+    print(known_face_encodings)
     # names_encodings = dict(zip(known_face_names, known_face_encodings))
 
     with open("pkl/known_face_names.pkl", "wb") as file:
@@ -56,21 +60,21 @@ def face_reco():
     with open("pkl/face_locations.pkl", "rb") as file:
         face_location = pickle.load(file)
         file.close()
-    
-    ##불러온 파일 이용해서 인코딩 구한다
-    face_encoding = face_recognition.face_encodings(rgb_for_face, face_location, num_jitters=1)
-
     with open("pkl/known_face_names.pkl", "rb") as file:
         known_face_names = pickle.load(file)
         file.close()
     with open("pkl/known_face_encodings.pkl", "rb") as file:
         known_face_encodings = pickle.load(file)
         file.close()
-
+    
+    ##불러온 파일 이용해서 인코딩 구한다
+    face_encoding = face_recognition.face_encodings(rgb_for_face, face_location)
     matches = face_recognition.compare_faces(known_face_encodings, face_encoding[0])
+    face_distances = face_recognition.face_distance(known_face_encodings, face_encoding[0])
+    best_match_index = np.argmin(face_distances)
 
-    if True in matches:
-        name = known_face_names[matches.index(True)]
+    if matches[best_match_index]:
+        name = known_face_names[best_match_index]
     else:
         name = "unknown"
     
@@ -92,7 +96,7 @@ def face_emo(model):
         roi_gray = gray_for_emotion[top:bottom, left:right]
         cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
         prediction = model.predict(cropped_img)
-        cv2.imwrite('cropped.png', roi_gray)
+        # cv2.imwrite('cropped.png', roi_gray)
         
         if len(prediction) != 0:
             prediction = prediction[0]
@@ -100,29 +104,55 @@ def face_emo(model):
             return prediction
         
 
-
+img2encoding()
 model = md.model_basic()
 model.load_weights('models/model.h5')
 
 cycle_time = 1
 
+prediction_sum = [0,0,0,0,0,0,0]
+
 while True:
     try:
         start = time.time() 
-        emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
-        
-        emotion = face_emo(model)
-        print(emotion_dict[np.argmax(emotion)])
-        
-        name = face_reco()
-        print(name)
-        ###################### 행동 #####################################
-        
+        with open("pkl/isDetected.pkl", "rb") as file:
+            isDetected = pickle.load(file)
+            file.close()
+        if isDetected == True: #인식이 된 상태
 
+            emotion_dict = {0: "Angry", 1: "Disgusted", 2: "Fearful", 3: "Happy", 4: "Neutral", 5: "Sad", 6: "Surprised"}
+            #5번의 감정을 평균낸다
+            # count=0
+            # while count==3:
+            #     prediction = face_emo(model)
+            #     prediction_sum = prediction_sum + prediction
+            #     count+=1
+            # prediction = prediction_sum
+            # prediction_sum = [0,0,0,0,0,0,0]
 
+            prediction = face_emo(model)
 
-        ################################################################
-        
+            emotion = emotion_dict[np.argmax(prediction)]
+            print(emotion)
+
+            name = face_reco()
+            print(name)
+            ###################### 행동 #####################################
+            onprocess = True
+            with open("pkl/onprocess.pkl", "wb") as file:
+                pickle.dump(onprocess, file)
+
+            display.emo2reaction(emotion, name)  ##unknown sangwon 
+
+            onprocess = False
+            with open("pkl/onprocess.pkl", "wb") as file:
+                pickle.dump(onprocess, file)
+            ################################################################
+        else: #인식이 안된 상태
+            #######################
+            display.noface()
+            #######################
+
         #코드 실행 시간
         print("time :", (time.time() - start), "\n") 
         
@@ -132,55 +162,5 @@ while True:
 
     except EOFError:
         pass
-
-
-
-
-
-
-    # count = 0
-    # emo_count = 5
-    # #5번 읽은 감정을 평균냄
-    # emo_sum = [0,0,0,0,0,0,0]
-    # emotion = [0,0,0,0,0,0,0]
-
-
-        # print("time :", time.time() - start) #코드 실행 시간
-        
-        
-        # emotion_dict[np.argmax(emotion)]
-
-        # print(emotion_dict[np.argmax[face_emo]])
-        # print(name)
-        # print(emotion)
-        #angry -> (화냄, 시선 회피, 울음)
-        #disgust -> (궁금, 회피, 화냄)
-        #fear -> (위로)
-        #happy -> (웃음, 장난, 춤)
-        #sad -> (위로, 울음)
-        #surprise -> (궁금, 놀람)
-        #neutral -> (장난, 심심, 졸음)
-        #혼자 장난치는 패턴 여러개
-        # webcam.webcam()
-        # face_position()
-        # face_emo()
-        # time.sleep(0.5)
-
-        # emo_sum = emo_sum + emo
-        # count += 1
-        # #얼굴 인식은 5번마다 한번씩 , 표정 인식은 5번을 평균내서
-        # if count == emo_count:
-        #     emo_sum = emo_sum/emo_count
-        #     emotion = emo_sum
-        #     name = face_reco()
-        #     # print(name, dict(zip(list(emotion_dict.values()), list(emo_sum))))
-    
-        #     ########### 여기에 행동 넣기 ################
-        #     print(name)
-        #     print(emotion_dict[np.argmax(emotion)])
-            
-
-        #     ############################################
-
-        #     emo_sum = [0,0,0,0,0,0,0]
-        #     count = 0
+    except pickle.UnpicklingError as e:
+        pass
