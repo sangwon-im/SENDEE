@@ -231,7 +231,7 @@ def headsleep():
 
 
 def emoreact(emotion):
-    
+    #neutral, happy, surprised, 
     if emotion == 'neutral1':
         head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
@@ -326,12 +326,12 @@ def emoreact(emotion):
     
     elif emotion == 'angry2':
         sleep(1.4)
-        Go(-100,0.2)
-        Go(100, 0.2)
-        Go(-100,0.2)
-        Go(100, 0.2)
-        Go(-100,0.2)
-        Go(100, 0.2)
+        # Go(-100,0.2)
+        # Go(100, 0.2)
+        # Go(-100,0.2)
+        # Go(100, 0.2)
+        # Go(-100,0.2)
+        # Go(100, 0.2)
 
     elif emotion == 'fear1':
         prev_angle = 14
@@ -355,11 +355,24 @@ def emoreact(emotion):
         sleep(2)
     
     elif emotion == 'surprised2':
-        Rot(-40, 0.1)
-        sleep(0.8)
-        Rot(40, 0.2)
-        sleep(0.65)
-        Rot(-40, 0.1)
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(left_maxdc)
+        right.ChangeDutyCycle(0)
+        sleep(1)
+        left.ChangeDutyCycle(left_maxdc-1)
+        sleep(0.2)
+        left.ChangeDutyCycle(left_maxdc)
+        sleep(0.2)
+        left.ChangeDutyCycle(left_maxdc-1)
+        sleep(1)
+        left.ChangeDutyCycle(left_mindc)
+        sleep(0.5)
+        left.ChangeDutyCycle(0)
+        # Rot(-40, 0.1)
+        # sleep(0.8)
+        # # Rot(40, 0.2)
+        # sleep(0.65)
+        # Rot(-40, 0.1)
 
     else:
         head.ChangeDutyCycle(0)
