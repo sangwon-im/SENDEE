@@ -1,11 +1,15 @@
 import cv2
 import time
 import random
+import pickle
 # import motordrive
 
 def display(filename, name, emotion):
     # motordrive.emoreact(filename)
     cap = cv2.VideoCapture(f"displays/{filename}.gif")
+    with open("pkl/emotion.pkl", "wb") as file:
+        pickle.dump(filename, file)
+
     while True:
         ret, frame = cap.read()
         if ret==False: break

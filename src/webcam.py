@@ -132,7 +132,7 @@ while True:
         time.sleep(cycle_time - (time.time() - start))
     print(isDetected)
 
-    GPIO.cleanup()
+GPIO.cleanup()
 
 
 
