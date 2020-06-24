@@ -45,7 +45,6 @@ while True:
     # if onprocess == True:
     #     # GPIO.cleanup()
     #     time.sleep(3.5)
-
     # else: 
     ret, frame = capture.read()
     if not ret: break
@@ -133,7 +132,7 @@ while True:
         time.sleep(cycle_time - (time.time() - start))
     print(isDetected)
 
-GPIO.cleanup()
+    GPIO.cleanup()
 
 
 
