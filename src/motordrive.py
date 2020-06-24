@@ -402,6 +402,7 @@ pwmB = setPinConfig(ENB, IN3, IN4)
 GPIO.setup(24, GPIO.OUT)
 head = GPIO.PWM(24, 50) #pin no 18 bcm24 head
 head.start(head_mindc + 1)
+head.ChangeDutyCycle(0)
 print('head ready')
 
 
