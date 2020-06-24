@@ -41,7 +41,7 @@ while True:
         onprocess = pickle.load(file)
         file.close()
     
-    #진행중이면 멈추기
+    진행중이면 멈추기
     if onprocess == True:
         # GPIO.cleanup()
         time.sleep(3.5)
