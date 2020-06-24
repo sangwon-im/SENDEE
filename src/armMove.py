@@ -12,9 +12,9 @@ while True:
             emotion = pickle.load(file)
         
         if emotion == 'neutral1':
-            cycle_time= 11*90/1000
+            cycle_time= 11*90/1000 + 0.1
         else:
-            cycle_time = 33*90/1000
+            cycle_time = 33*90/1000 + 0.1
         
         motordrive.emoreact(emotion)
         
