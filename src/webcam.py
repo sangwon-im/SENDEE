@@ -1,7 +1,7 @@
 import cv2
 import pickle
-# import motordrive
-# import RPi.GPIO as GPIO
+import motordrive
+import RPi.GPIO as GPIO
 import time
 import numpy as np
 
@@ -106,22 +106,22 @@ while True:
             ###########
             hor_error_Sum = hor_error_Sum + x_pos
             ver_error_Sum = ver_error_Sum + y_pos
-            # motordrive.MPIDCtrl(x_pos, 0.05, hor_error_Sum, hor_error_Prev)
-            # past_dc = motordrive.Servo(y_pos, 0.05, past_dc, ver_error_Sum, ver_error_Prev)
-            # 0.1 sec movememt
+            motordrive.MPIDCtrl(x_pos, 0.05, hor_error_Sum, hor_error_Prev)
+            past_dc = motordrive.Servo(y_pos, 0.05, past_dc, ver_error_Sum, ver_error_Prev)
+            0.1 sec movememt
             hor_error_Prev = x_pos
             ver_error_Prev = y_pos
             ###########
 
         else:     # No face detected
             if isDetected==True:
-                # motordrive.headsleep()
+                motordrive.headsleep()
                 isDetected = False #사람없으면 True
                 with open("pkl/isDetected.pkl", "wb") as file:
                     pickle.dump(isDetected, file)
                     file.close()
             else:
-                # motordrive.headsleep()
+                motordrive.headsleep()
                 print('')
                 
 
@@ -134,6 +134,9 @@ while True:
             time.sleep(cycle_time - (time.time() - start))
         print(isDetected)
 
+GPIO.cleanup()
+
+
+
 # capture.release()
 # cv2.destroyAllWindows()
-# GPIO.cleanup()
