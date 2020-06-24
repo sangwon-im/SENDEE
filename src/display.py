@@ -4,6 +4,7 @@ import random
 import motordrive
 
 def display(filename, name, emotion):
+    motordrive.emoreact(filename)
     cap = cv2.VideoCapture(f"displays/{filename}.gif")
     while True:
         ret, frame = cap.read()
@@ -36,7 +37,6 @@ def display(filename, name, emotion):
         
         #재생 되는 순간
         cv2.imshow("VideoFrame", frame)
-        motordrive.emoreact(filename)
 
 
 def emo2reaction(emotion, name):
