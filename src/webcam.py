@@ -108,7 +108,6 @@ while True:
             ver_error_Sum = ver_error_Sum + y_pos
             motordrive.MPIDCtrl(x_pos, 0.05, hor_error_Sum, hor_error_Prev)
             past_dc = motordrive.Servo(y_pos, 0.05, past_dc, ver_error_Sum, ver_error_Prev)
-            0.1 sec movememt
             hor_error_Prev = x_pos
             ver_error_Prev = y_pos
             ###########
