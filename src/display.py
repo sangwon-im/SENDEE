@@ -3,7 +3,7 @@ import time
 import random
 import pickle
 
-count = True
+global count = True
 
 def display(filename, name, emotion):
     cap = cv2.VideoCapture(f"displays/{filename}.gif")
