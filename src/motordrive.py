@@ -141,11 +141,11 @@ def MPIDCtrl(error_Now, interval, error_Sum, error_Prev):          # While ым╕ ы
     elif speed < -100:
         speed = -100
         
-    elif 10 < speed < 30:
-        speed = 30
+    elif 10 < speed < 40:
+        speed = 40
         
-    elif -30 < speed < -10:
-        speed = -30
+    elif -40 < speed < -10:
+        speed = -40
 
     if abs(speed) < 10:
         speed = 0
