@@ -1,22 +1,7 @@
 import cv2
 import time
 import random
-
-#사람 인식 못하면 재밌는 gif 아무거나 랜덤 재생
-
-# neutral1 #기본
-# neutral2 #기본
-# neutral3 #unknown
-# angry1 #쫄았다
-# angry2 #같이 화낸다
-# happy1 #해피
-# happy2 #비웃음
-# sad1 #한숨
-# sad2 #눈물
-# fear1 #무서워서 소리침
-# fear2 #지켜줄게? 화나보인다
-# surprise1 #깜짝아;;
-# surprise2 #무슨일이지????
+import motordrive
 
 def display(filename, name, emotion):
     cap = cv2.VideoCapture(f"displays/{filename}.gif")
@@ -25,6 +10,7 @@ def display(filename, name, emotion):
         if ret==False: break
 
         #뉴트럴만 좀 빨리 재생하도록
+        #프레임당 33ms 기다리고 다음 프레임 재생
         if filename == "neutral1":
             cv2.waitKey(11)
         else:
@@ -47,13 +33,14 @@ def display(filename, name, emotion):
         else:
             name_ = name.capitalize()
             cv2.putText(frame, f"{name_}, you look {emotion}", (30, 470), font, 1.0, (0, 0, 0), 1)
-
+        
+        #재생 되는 순간
         cv2.imshow("VideoFrame", frame)
-        #프레임당 33ms 기다리고 다음 프레임 재생
+        motordrive.emoreact(filename)
 
 
 def emo2reaction(emotion, name):
-    
+
     if emotion == 'Neutral':
         if name != "unknown": #아는 사람
             if random.randrange(100) < 50:
@@ -131,3 +118,20 @@ def noface():
 
 
 # print(random.randrange(2))
+
+
+#사람 인식 못하면 재밌는 gif 아무거나 랜덤 재생
+
+# neutral1 #기본
+# neutral2 #기본
+# neutral3 #unknown
+# angry1 #쫄았다
+# angry2 #같이 화낸다
+# happy1 #해피
+# happy2 #비웃음
+# sad1 #한숨
+# sad2 #눈물
+# fear1 #무서워서 소리침
+# fear2 #지켜줄게? 화나보인다
+# surprise1 #깜짝아;;
+# surprise2 #무슨일이지????

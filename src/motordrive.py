@@ -62,13 +62,11 @@ def Rot(speed, time):# 40-100, SECOND
 def Go(speed, time):# 40-100, SECOND
 
     if speed > 0:
-        print('move head leftward')
         setMotor(CH1, speed, FORWARD)
         setMotor(CH2, speed, FORWARD)
         sleep(time)
 
     elif speed < 0:
-        print('move head rightward')
         setMotor(CH1, -speed, BACKWARD)
         setMotor(CH2, -speed, BACKWARD)
         sleep(time)
@@ -143,11 +141,11 @@ def MPIDCtrl(error_Now, interval, error_Sum, error_Prev):          # While 문 �
     elif speed < -100:
         speed = -100
         
-    elif 10 < speed < 40:
-        speed = 40
+    elif 10 < speed < 30:
+        speed = 30
         
-    elif -40 < speed < -10:
-        speed = -40
+    elif -30 < speed < -10:
+        speed = -30
 
     if abs(speed) < 10:
         speed = 0
@@ -232,27 +230,143 @@ def headsleep():
     head.ChangeDutyCycle(0)
 
 
-# def Angry():
-#     #Angry 해당되는 motion
-# 
-# def Sad():
-#     #Sad 해당되는 motion
-# 
-# def Happy():
-#     #Angry 해당되는 motion
-# 
-# def Disgust():
-#     #Sad 해당되는 motion
-# 
-# def Fear():
-#     #Angry 해당되는 motion
-# 
-# def Surprised():
-#     #Sad 해당되는 motion
-# 
-# def Neutral():
-#     #Angry 해당되는 motion
+def emoreact(emotion):
+    
+    if emotion == 'neutral1':
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(0)
+        right.ChangeDutyCycle(0)
+        sleep(1)
+    
+    elif emotion == 'neutral2':
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(0)
+        right.ChangeDutyCycle(0)
+        sleep(3)
+        
+    elif emotion == 'neutral3':
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(left_maxdc)
+        right.ChangeDutyCycle(0)
+        sleep(1)
+        left.ChangeDutyCycle(left_maxdc-1)
+        sleep(0.2)
+        left.ChangeDutyCycle(left_maxdc)
+        sleep(0.2)
+        left.ChangeDutyCycle(left_maxdc-1)
+        sleep(1)
+        left.ChangeDutyCycle(left_mindc)
+        sleep(0.5)
+        left.ChangeDutyCycle(0)
+        
+    elif emotion == 'happy1':
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(0)
+        right.ChangeDutyCycle(0)
+        sleep(3)
+        
+    elif emotion == 'happy2':
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(0)
+        right.ChangeDutyCycle(0)
+        sleep(1)
+        left.ChangeDutyCycle(left_mindc)
+        right.ChangeDutyCycle(right_mindc)
+        sleep(0.18)
+        left.ChangeDutyCycle(left_mindc-1)
+        right.ChangeDutyCycle(right_mindc+1)
+        sleep(0.18)
+        left.ChangeDutyCycle(left_mindc)
+        right.ChangeDutyCycle(right_mindc)
+        sleep(0.18)
+        left.ChangeDutyCycle(left_mindc-1)
+        right.ChangeDutyCycle(right_mindc+1)
+        sleep(0.18)
+        left.ChangeDutyCycle(left_mindc)
+        right.ChangeDutyCycle(right_mindc)
+        sleep(0.18)
+        left.ChangeDutyCycle(left_mindc-1)
+        right.ChangeDutyCycle(right_mindc+1)
+        sleep(0.18)
+        left.ChangeDutyCycle(left_mindc)
+        right.ChangeDutyCycle(right_mindc)
+        sleep(0.5)
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(0)
+        right.ChangeDutyCycle(0)
+        
+    elif emotion == 'sad1':
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(0)
+        right.ChangeDutyCycle(0)
+        prev_angle = 0
+        sleep(0.3)
+        prev_angle = movetogether(prev_angle, 14, 2)
+        sleep(0.5) #### sdflkasjfoasdjf
+        prev_angle = movetogether(prev_angle, 0, 0.5)
+        
+    elif emotion == 'sad2':
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(0)
+        right.ChangeDutyCycle(0)
+        sleep(2.27)
+        prev_angle = 0
+        prev_angle = movetogether(prev_angle, 2, 3)
+        prev_angle = movetogether(prev_angle, 0, 3)
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(0)
+        right.ChangeDutyCycle(0)
+        
+    elif emotion == 'angry1':
+        Go(-40, 0.5)
+        sleep(0.5)
+        shake(0, 15)
+        sleep(1)
+        Go(40, 0.5)
+    
+    elif emotion == 'angry2':
+        sleep(1.4)
+        Go(-100,0.2)
+        Go(100, 0.2)
+        Go(-100,0.2)
+        Go(100, 0.2)
+        Go(-100,0.2)
+        Go(100, 0.2)
 
+    elif emotion == 'fear1':
+        prev_angle = 14
+        sleep(1)
+        prev_angle = movetogether(prev_angle, 14, 3)
+        sleep(0.2)
+        prev_angle = moveopposite(prev_angle, 2, 5)
+        prev_angle = moveopposite(prev_angle, -2, 5)
+        prev_angle = moveopposite(prev_angle, 2, 5)
+        prev_angle = moveopposite(prev_angle, -2, 5)
+        prev_angle = moveopposite(prev_angle, 2, 5)
+        prev_angle = moveopposite(prev_angle, -2, 5)
+        sleep(0.5)
+        prev_angle = movetogether(prev_angle, 0, 3)
+        
+    elif emotion == 'surprised1':
+        prev_angle = 0
+        sleep(0.1)
+        prev_angle = movetogether(prev_angle, 5, 5)
+        prev_angle = movetogether(prev_angle, 0, 5)
+        sleep(2)
+    
+    elif emotion == 'surprised2':
+        Rot(-40, 0.1)
+        sleep(0.8)
+        Rot(40, 0.2)
+        sleep(0.65)
+        Rot(-40, 0.1)
+
+    else:
+        head.ChangeDutyCycle(0)
+        left.ChangeDutyCycle(0)
+        right.ChangeDutyCycle(0)
+        sleep(3)
+        
 
 #Motor Status
 STOP = 0
@@ -325,21 +439,10 @@ print('arm ready')
 # 
 # while True:
 #     
-#     prev_angle = movetogether(prev_angle, 0, 1)
+# #     prev_angle = movetogether(prev_angle, 0, 1)
+# #     sleep(1)
+#     emoreact('surprise2')
 #     sleep(1)
-#     prev_angle = movetogether(prev_angle, 2, 3)
-#     sleep(1)
-#     prev_angle = movetogether(prev_angle, 4, 3)
-#     sleep(1)
-#     prev_angle = movetogether(prev_angle, 6, 3)
-#     sleep(1)
-#     prev_angle = movetogether(prev_angle, 8, 3)
-#     sleep(1)
-#     prev_angle = movetogether(prev_angle, 10, 3)
-#     sleep(1)
-#     prev_angle = movetogether(prev_angle, 13, 3)
-#     sleep(1)
-#     prev_angle = movetogether(prev_angle, 16, 3)
-#     sleep(1)
-#     
-# GPIO.cleanup()
+
+    
+#GPIO.cleanup()

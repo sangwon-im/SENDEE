@@ -18,7 +18,7 @@ from keras.layers import Dense, Activation, BatchNormalization
 import numpy as np
 
 import model as md
-# import motordrive
+import motordrive
 import display
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
