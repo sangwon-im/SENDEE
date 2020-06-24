@@ -233,19 +233,16 @@ def headsleep():
 def emoreact(emotion):
     #neutral, happy, surprised, 
     if emotion == 'neutral1':
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
         sleep(0.5)
     
     elif emotion == 'neutral2':
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
         sleep(2.5)
         
     elif emotion == 'neutral3':
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(left_maxdc)
         right.ChangeDutyCycle(0)
         sleep(1)
@@ -260,13 +257,11 @@ def emoreact(emotion):
         left.ChangeDutyCycle(0)
         
     elif emotion == 'happy1':
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
         sleep(2.5)
         
     elif emotion == 'happy2':
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
         sleep(1)
@@ -291,12 +286,10 @@ def emoreact(emotion):
         left.ChangeDutyCycle(left_mindc)
         right.ChangeDutyCycle(right_mindc)
         sleep(0.5)
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
         
     elif emotion == 'sad1':
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
         prev_angle = 0
@@ -306,14 +299,12 @@ def emoreact(emotion):
         prev_angle = movetogether(prev_angle, 0, 0.5)
         
     elif emotion == 'sad2':
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
         sleep(2)
         prev_angle = 0
         prev_angle = movetogether(prev_angle, 2, 3)
         prev_angle = movetogether(prev_angle, 0, 3)
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
         
@@ -349,7 +340,6 @@ def emoreact(emotion):
         sleep(1.5)
     
     elif emotion == 'surprised2':
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(left_maxdc)
         right.ChangeDutyCycle(0)
         sleep(1)
@@ -369,7 +359,6 @@ def emoreact(emotion):
         # Rot(-40, 0.1)
 
     else:
-        head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
         sleep(2.5)
