@@ -318,11 +318,11 @@ def emoreact(emotion):
         right.ChangeDutyCycle(0)
         
     elif emotion == 'angry1':
-        Go(-40, 0.5)
+        # Go(-40, 0.5)
         sleep(0.5)
         shake(0, 15)
         sleep(1)
-        Go(40, 0.5)
+        # Go(40, 0.5)
     
     elif emotion == 'angry2':
         sleep(1.4)
@@ -429,6 +429,7 @@ right.start(right_mindc)
 left.ChangeDutyCycle(0)
 right.ChangeDutyCycle(0)
 print('arm ready')
+
 
 
 #Control example
