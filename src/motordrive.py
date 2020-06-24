@@ -236,13 +236,13 @@ def emoreact(emotion):
         head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
-        sleep(1)
+        sleep(0.5)
     
     elif emotion == 'neutral2':
         head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
-        sleep(3)
+        sleep(2.5)
         
     elif emotion == 'neutral3':
         head.ChangeDutyCycle(0)
@@ -263,7 +263,7 @@ def emoreact(emotion):
         head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
-        sleep(3)
+        sleep(2.5)
         
     elif emotion == 'happy2':
         head.ChangeDutyCycle(0)
@@ -309,7 +309,7 @@ def emoreact(emotion):
         head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
-        sleep(2.27)
+        sleep(2)
         prev_angle = 0
         prev_angle = movetogether(prev_angle, 2, 3)
         prev_angle = movetogether(prev_angle, 0, 3)
@@ -321,17 +321,11 @@ def emoreact(emotion):
         # Go(-40, 0.5)
         sleep(0.5)
         shake(0, 15)
-        sleep(1)
         # Go(40, 0.5)
     
     elif emotion == 'angry2':
         sleep(1.4)
-        # Go(-100,0.2)
-        # Go(100, 0.2)
-        # Go(-100,0.2)
-        # Go(100, 0.2)
-        # Go(-100,0.2)
-        # Go(100, 0.2)
+
 
     elif emotion == 'fear1':
         prev_angle = 14
@@ -352,7 +346,7 @@ def emoreact(emotion):
         sleep(0.1)
         prev_angle = movetogether(prev_angle, 5, 5)
         prev_angle = movetogether(prev_angle, 0, 5)
-        sleep(2)
+        sleep(1.5)
     
     elif emotion == 'surprised2':
         head.ChangeDutyCycle(0)
@@ -378,7 +372,7 @@ def emoreact(emotion):
         head.ChangeDutyCycle(0)
         left.ChangeDutyCycle(0)
         right.ChangeDutyCycle(0)
-        sleep(3)
+        sleep(2.5)
         
 
 #Motor Status
