@@ -3,15 +3,13 @@ import time
 import random
 import pickle
 
-global count = True
 
 def display(filename, name, emotion):
     cap = cv2.VideoCapture(f"displays/{filename}.gif")
     
-    count = not count
 
     with open("pkl/emotion.pkl", "wb") as file:
-        pickle.dump([filename, count], file)
+        pickle.dump(filename, file)
 
     while True:
         ret, frame = cap.read()
@@ -23,7 +21,7 @@ def display(filename, name, emotion):
             cv2.waitKey(11)
         else:
             cv2.waitKey(33)
-
+    
         ##인식 되고, 알때
         ##인식 되고, 모를때
         ##인식 안될때
