@@ -24,19 +24,21 @@ def display(filename, name, emotion):
 
         if name =="noone":
             if emotion == "fun":
-                cv2.putText(frame, f"Anybody there..?", (30, 470), font, 1.0, (0, 0, 0), 1)
+                cv2.putText(frame, f"Anybody there..?", (30, 450), font, 1.0, (0, 0, 0), 1)
             else:
-                cv2.putText(frame, f"Anybody there..?", (30, 470), font, 1.0, (0, 0, 0), 1)
+                cv2.putText(frame, f"Anybody there..?", (30, 450), font, 1.0, (0, 0, 0), 1)
         
         elif name == "unknown": 
-            cv2.putText(frame, f"Who are you?? You look {emotion}", (30, 470), font, 1.0, (0, 0, 0), 1)
+            cv2.putText(frame, f"Who are you?? You look {emotion}", (30, 450), font, 1.0, (0, 0, 0), 1)
         
         else:
             name_ = name.capitalize()
-            cv2.putText(frame, f"{name_}, you look {emotion}", (30, 470), font, 1.0, (0, 0, 0), 1)
+            cv2.putText(frame, f"{name_}, you look {emotion}", (30, 450), font, 1.0, (0, 0, 0), 1)
         
         #재생 되는 순간
-        cv2.imshow("VideoFrame", frame)
+        cv2.namedWindow("window", cv2.WND_PROP_FULLSCREEN)
+        cv2.setWindowProperty("window",cv2.WND_PROP_FULLSCREEN,cv2.WINDOW_FULLSCREEN)
+        cv2.imshow("window", frame)
 
 
 def emo2reaction(emotion, name):
