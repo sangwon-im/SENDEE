@@ -21,6 +21,5 @@ while True:
         if (time.time() - start) < cycle_time:
             time.sleep(cycle_time - (time.time() - start))
 
-
     except EOFError:
         pass
