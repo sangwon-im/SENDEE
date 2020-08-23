@@ -1,4 +1,5 @@
-import threading, time
+from multiprocessing import Process
+import time
 
 def test1():
     time.sleep(5)
@@ -16,10 +17,6 @@ def test3():
 
 
 if __name__ == '__main__':
-    t1=threading.Thread(target=test1)
-    t2=threading.Thread(target=test2)
-    t3=threading.Thread(target=test3)
-
-    t1.start()
-    t2.start()
-    t3.start()
+    Process(target=test1).start()
+    Process(target=test2).start()
+    Process(target=test3).start()
