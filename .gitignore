@@ -3,3 +3,4 @@ src/data/train/**
 
 src/.vscode/
 src/__pycache__
+*.pkl

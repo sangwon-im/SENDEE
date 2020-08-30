@@ -86,7 +86,7 @@ def Servo(error_Now, time, past_dc, error_Sum, error_Prev):
     global head_maxdc 
     global head_interval
     
-    Kp = 0.5
+    Kp = 0.2
     Ki = 0
     Kd = 0
 
